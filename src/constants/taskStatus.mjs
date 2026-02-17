@@ -1,0 +1,7 @@
+export const TASK_STATUS = Object.freeze({
+    PENDING: 'PENDING',
+    IN_PROGRESS: 'IN_PROGRESS',
+    BLOCKED: 'BLOCKED',
+    PAUSED: 'PAUSED',
+    COMPLETED: 'COMPLETED',
+});
