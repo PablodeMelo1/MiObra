@@ -6,13 +6,14 @@ import {
     updateComment,
     getCommentById
 } from "../../controllers/comment-controller.mjs";
+import { auth } from "../../middleware/auth-middleware.mjs";
 
 const routes = express.Router();
 
-routes.post("/:entityType/:entityId", createComment);
-routes.get("/:entityType/:entityId", getCommentsByEntity);
-routes.get("/:id", getCommentById);
-routes.put("/:id", updateComment);
-routes.delete("/:id", deleteComment);
+routes.post("/:entityType/:entityId", auth, createComment);
+routes.get("/:entityType/:entityId", auth, getCommentsByEntity);
+routes.get("/:id", auth, getCommentById);
+routes.put("/:id", auth, updateComment);
+routes.delete("/:id", auth, deleteComment);
 
 export default routes;

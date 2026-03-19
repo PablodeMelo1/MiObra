@@ -1,58 +1,48 @@
+import MaterialRequest from '../model/materialRequest-schema.mjs';
 
-import MaterialRequest from "../model/materialRequest.mjs";
+export default class MaterialRequestRepository {
+  async createOne(data) {
+    const materialRequest = new MaterialRequest(data);
+    return materialRequest.save();
+  }
 
-export default class materialRequestMongoRepository {
-    async createOne(data) {
-        try {
-            const matReq = new MaterialRequest(data);
-            const newMatReq = await matReq.save();
-            return newMatReq;
-        } catch (error) {
-            throw new Error("Error creating a material request: ", error.message);
-        }
-    }
+  async getAll() {
+    return MaterialRequest.find()
+      .populate('supplierId', 'name contactEmail')
+      .populate('projectId', 'name')
+      .populate('createdBy', 'name email')
+      .sort({ createdAt: -1 });
+  }
 
-    async getAll() {
-        return MaterialRequest.find();
-    }
+  async getById(data) {
+    const id = typeof data === 'string' ? data : data?._id;
+    return MaterialRequest.findById(id)
+      .populate('supplierId', 'name contactEmail')
+      .populate('projectId', 'name')
+      .populate('createdBy', 'name email');
+  }
 
-    async getById(data) {
-        return MaterialRequest.findOne(data);
-    }
+  async deleteById(data) {
+    const id = typeof data === 'string' ? data : data?._id;
+    return MaterialRequest.findByIdAndDelete(id);
+  }
 
-    async deleteByID(data) {
-        try {
-            const { _id } = data;
-            const matReq = MaterialRequest.findByID({ _id });
-            if (!matReq) throw new Error(`Material request con id ${_id} no encontrado`);
-            await MaterialRequest.findByIdAndDelete({ _id });
-        } catch (error) {
-            throw new Error("Error deleting by ID: ", error.message);
-        }
-    }
+  async updateById(data, updateData = {}) {
+    const id = typeof data === 'string' ? data : data?._id;
+    return MaterialRequest.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    })
+      .populate('supplierId', 'name contactEmail')
+      .populate('projectId', 'name')
+      .populate('createdBy', 'name email');
+  }
 
-    async updateMaterialRequest(data){
-        try {
-            const {_id, ...matReq} = data;
-            const matRequest = MaterialRequest.findByID(_id);
-            if(!matReq) throw new Error(`Material request con id ${_id} no encontrado`);
-            return await MaterialRequest.findByIdAndUpdate({_id}, {matReq}, {new: true});
-        } catch (error) {
-            throw new Error("Error updating by ID: ", error.message);
-        }
-    }
-
-    async updateStatus(data) {
-        const { _id, status } = data;
-        return MaterialRequest.findOneAndUpdate({ _id }, { status });
-    }
-
-    async updatePriority(data) {
-        const { _id, prio } = data;
-        return MaterialRequest.findOneAndUpdate({ _id }, { prio })
-    }
-    async updateAssigned(data) {
-        const { _id, assig } = data;
-        return MaterialRequest.findOneAndUpdate({ _id }, { assig })
-    }
+  async updateStatus(data) {
+    const { _id, status } = data;
+    return MaterialRequest.findByIdAndUpdate(_id, { status }, { new: true, runValidators: true })
+      .populate('supplierId', 'name contactEmail')
+      .populate('projectId', 'name')
+      .populate('createdBy', 'name email');
+  }
 }

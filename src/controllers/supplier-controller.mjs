@@ -1,4 +1,4 @@
-import { createError } from "../error/create-error.mjs";
+import { createError } from '../error/create-error.mjs';
 import supplierMongoRepository from "../repositories/supplier-repository.mjs";
 
 export const createSupplier = async (req, res) => {

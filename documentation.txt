@@ -115,5 +115,29 @@ npm i cors
 npm i dotenv
 npm i joi
 
+Explicacion del funcionamiento del sistema
+
+El sistema se basa en varias features que son independientes y no dependen entre si.
+
+Sistema de roles: 
+  - Admin: Usuario adminiastador de roles de los demas usuarios. 
+    Accesos: TODO, 
+
+  - Usuario: Usuario de menor poder que el admin
+    Accesos:
+       - Gestor de tasks, crear proyectos. COMPLETO
+       - Pendientes. COMPLETO.
+       - Inventario de herramientas. COMPLETO. (mas adelante se puede pensar un rol especifico para esto)
+       - Suppliers. NO ACCESO.
+       - Peticion de materiales. NO ACCESO
+
+
+
+Gestor de tasks: Un usuario es miembro de un proyecto con un rol, dentro del proyecto hay una tabla kanban con las tasks con su informacion necesaria.
+Pendientes: Un usuario tiene pendientes, y puede agregar colaboradores, los usuarios dentro de la lista de colaboradores podran ver y editar el pendientes
+Peticion de materiales: Un usuario puede realizar peticion de materiales.
+Inventario de herramientas: Un usuario puede crear herraminetas, tener un stock, tipo de item, y hacer checkout y checkin del mismo
+Suppliers: Se puede hacer CRUD de suppliers con su info necesaria
+
 
 

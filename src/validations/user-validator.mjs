@@ -1,4 +1,4 @@
-import joi from "joi";
+import Joi from "joi";
 
 export const validateCreateUser = Joi.object({
     name: Joi.string().min(3).max(30).required(),

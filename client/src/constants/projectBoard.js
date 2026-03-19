@@ -1,0 +1,3 @@
+export const PROJECT_ROLE_OPTIONS = Object.freeze(['OWNER', 'READ', 'READWRITE']);
+
+export const DEFAULT_PROJECT_MEMBER_ROLE = PROJECT_ROLE_OPTIONS[1];

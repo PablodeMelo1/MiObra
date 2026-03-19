@@ -5,6 +5,7 @@ import projectMongoRepository from "../repositories/project-repository.mjs";
 export const createTask = async (req, res) => {
     try {
         const taskRepository = new taskMongoRepository();
+        const projectRepository = new projectMongoRepository();
         const { projectId } = req.params;
         const { list, ...taskData } = req.body;
 
@@ -19,7 +20,7 @@ export const createTask = async (req, res) => {
         }
 
         // Validar que la lista existe en el proyecto
-        const project = await projectMongoRepository.getById({ _id: projectId });
+        const project = await projectRepository.getById({ _id: projectId });
         if (!project) {
             return res.status(404).json({ message: "Proyecto no encontrado" });
         }
@@ -155,14 +156,15 @@ export const updateTask = async (req, res) => {
         }
 
         // Obtener tarea actual
-        const currentTask = await taskRepository.getByIdAndProject({ _id: id, projectId });
+        const currentTask = await taskRepository.getByIdAndProject({ _id: id, project: projectId });
         if (!currentTask) {
             return res.status(404).json({ message: "Tarea no encontrada" });
         }
 
         // Si se intenta cambiar de lista, validar que existe
         if (list && list !== currentTask.list) {
-            const project = await projectMongoRepository.getById({ _id: projectId });
+            const projectRepository = new projectMongoRepository();
+            const project = await projectRepository.getById({ _id: projectId });
             if (!project || !project.lists.includes(list)) {
                 return res.status(400).json({ message: `La lista '${list}' no existe en este proyecto` });
             }

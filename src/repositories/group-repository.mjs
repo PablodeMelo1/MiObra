@@ -1,4 +1,4 @@
-import Group from "../model/group.mjs";
+import Group from "../model/group-schema.mjs";
 
 export default class groupMongoRepository {
 

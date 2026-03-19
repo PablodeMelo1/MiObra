@@ -7,14 +7,15 @@ import {
     updateGroup,
     deleteGroup
 } from "../../controllers/group-controller.mjs";
+import { auth } from "../../middleware/auth-middleware.mjs";
 
 const routes = express.Router();
 
-routes.post("/", createGroup);
-routes.get("/", getAllGroups);
-routes.get("/user/:userId", getGroupsByUser);
-routes.get("/:id", getGroupById);
-routes.put("/:id", updateGroup);
-routes.delete("/:id", deleteGroup);
+routes.post("/", auth, createGroup);
+routes.get("/", auth, getAllGroups);
+routes.get("/user/:userId", auth, getGroupsByUser);
+routes.get("/:id", auth, getGroupById);
+routes.put("/:id", auth, updateGroup);
+routes.delete("/:id", auth, deleteGroup);
 
 export default routes;

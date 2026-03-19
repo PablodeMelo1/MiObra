@@ -1,62 +1,32 @@
-import Pending from "../model/pending.mjs";
-import Group from "../model/group.mjs";
+import Pending from '../model/pending-schema.mjs';
+import { PENDING_POPULATE } from '../constants/pending-constants.mjs';
 
-export default class pendingMongoRepository {
-    async createOne(data) {
-        try {
-            const newPending = new Pending(data);
-            const savePending = await newPending.save();
-            return savePending;
-        } catch (error) {
-            throw new Error('error creating a pending');
-        }
-    }
+export default class PendingRepository {
+  async createOne(data) {
+    const pending = new Pending(data);
+    const saved = await pending.save();
+    return Pending.findById(saved._id).populate(PENDING_POPULATE);
+  }
 
-    async deleteById(data) {
-        const { _id } = data;
-        const pending = Pending.findById(_id);
-        if (!pending) throw new Error("Id incorrecto");
-        await Pending.deleteOne(_id);
-    }
+  async getAllByUser(userId) {
+    return Pending.find({ collaborators: userId })
+      .populate(PENDING_POPULATE)
+      .sort({ createdAt: -1 });
+  }
 
-    async updatePending(data) {
-        const { _id, ...updateData } = data;
-        return Pending.findOneAndUpdate({ _id }, updateData, { new: true });
-    }
+  async getByIdForUser(id, userId) {
+    return Pending.findOne({ _id: id, collaborators: userId }).populate(PENDING_POPULATE);
+  }
 
-    async getById(data) {
-        return Pending.findOne(data);
-    }
+  async updateByIdForUser(id, userId, updateData = {}) {
+    return Pending.findOneAndUpdate(
+      { _id: id, collaborators: userId },
+      updateData,
+      { new: true, runValidators: true },
+    ).populate(PENDING_POPULATE);
+  }
 
-    async getAllByUser(userId) {
-        try {
-            const userGroups = await Group.find({ users: userId });
-            const groupIds = userGroups.map(g => g._id);
-
-            return await Pending.find({
-                $or: [
-                    { assignedTo: userId },
-                    { colaborators: { $in: [userId] } },
-                    { Groups: { $in: groupIds } }
-                ]
-            });
-        } catch (error) {
-            throw new Error('Error obteniendo pending del usuario: ' + error.message);
-        }
-    }
-
-    async getAll() {
-        return await Pending.find();
-    }
-
-    async updateStatus(data) {
-        const { _id, status } = data;
-        return Pending.findOneAndUpdate({ _id }, { status }, {new: true});
-    }
-
-    async updatePriority(data) {
-        const { _id, prio } = data;
-        return Pending.findOneAndUpdate({_id}, {prio}, {new: true})
-    }
-
+  async deleteByIdForUser(id, userId) {
+    return Pending.findOneAndDelete({ _id: id, collaborators: userId });
+  }
 }
