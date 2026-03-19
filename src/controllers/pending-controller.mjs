@@ -1,87 +1,159 @@
-import { createError } from "../error/create-error.mjs";
-import pendingMongoRepository from "../repositories/pending-repository.mjs";
+import { createError } from '../error/create-error.mjs';
+import PendingRepository from '../repositories/pending-repository.mjs';
+import { PENDING_ERRORS } from '../constants/pending-constants.mjs';
+import {
+  buildCreatePendingPayload,
+  buildUpdatePendingPayload,
+  isAssignedWithinCollaborators,
+} from '../services/pending-service.mjs';
+
+const getAuthenticatedUserId = (req) => req.user?.id;
+
+const validateAuthenticated = (res, userId) => {
+  if (userId) return false;
+  res.status(401).json({ message: PENDING_ERRORS.UNAUTHORIZED });
+  return true;
+};
 
 export const createPending = async (req, res) => {
-    try {
-        const pendingRepository = new pendingMongoRepository();
-        const { title, description, assignedTo, status, priority, colaborators, Groups } = req.body;
-        if (!title) {
-            return res.status(400).json({ message: "El título es obligatorio" });
-        }
-        const newPending = { title, description, assignedTo, status, priority, colaborators, Groups };
-        const createdPending = await pendingRepository.createOne(newPending);
-        if (!createdPending) {
-            return res.status(500).json({ message: "Error al crear el pendiente" });
-        }
-        res.status(201).json(createdPending);
-    } catch (error) {
-        throw createError("No pudo crear el pendiente", 500);
+  try {
+    const pendingRepository = new PendingRepository();
+    const userId = getAuthenticatedUserId(req);
+
+    if (validateAuthenticated(res, userId)) return;
+
+    const { title } = req.body;
+    if (!title) {
+      return res.status(400).json({ message: PENDING_ERRORS.TITLE_REQUIRED });
     }
-}
+
+    const { payload, assignedTo, collaborators } = buildCreatePendingPayload({
+      body: req.body,
+      userId,
+    });
+
+    if (!isAssignedWithinCollaborators({ assignedTo, collaborators })) {
+      return res.status(400).json({ message: PENDING_ERRORS.ASSIGNED_NOT_COLLABORATOR });
+    }
+
+    const createdPending = await pendingRepository.createOne(payload);
+
+    return res.status(201).json(createdPending);
+  } catch (error) {
+    throw createError(PENDING_ERRORS.CREATE_FAILED, 500);
+  }
+};
 
 export const getPendingById = async (req, res) => {
-    try {
-        const pendingRepository = new pendingMongoRepository();
-        const { id } = req.params;
-        const pending = await pendingRepository.getById({ _id: id });
-        if (!pending) {
-            return res.status(404).json({ message: "Pendiente no encontrado" });
-        }
-        res.status(200).json({ pending });
-    } catch (error) {
-        throw createError("No pudo obtener el pendiente", 500);
+  try {
+    const pendingRepository = new PendingRepository();
+    const userId = getAuthenticatedUserId(req);
+    const { id } = req.params;
+
+    if (validateAuthenticated(res, userId)) return;
+
+    const pending = await pendingRepository.getByIdForUser(id, userId);
+    if (!pending) {
+      return res.status(404).json({ message: PENDING_ERRORS.NOT_FOUND });
     }
-}
+
+    return res.status(200).json({ pending });
+  } catch (error) {
+    throw createError(PENDING_ERRORS.GET_FAILED, 500);
+  }
+};
 
 export const getAllPending = async (req, res) => {
-    try {
-        const pendingRepository = new pendingMongoRepository();
-        const pendings = await pendingRepository.getAll();
-        res.status(200).json({ pendings });
-    } catch (error) {
-        throw createError("No pudo obtener los pendientes", 500);
-    }
-}
+  try {
+    const pendingRepository = new PendingRepository();
+    const userId = getAuthenticatedUserId(req);
+
+    if (validateAuthenticated(res, userId)) return;
+
+    const pendings = await pendingRepository.getAllByUser(userId);
+    return res.status(200).json({ pendings });
+  } catch (error) {
+    throw createError(PENDING_ERRORS.GET_ALL_FAILED, 500);
+  }
+};
 
 export const getPendingsByUser = async (req, res) => {
-    try {
-        const pendingRepository = new pendingMongoRepository();
-        const { userId } = req.params;
-        if (!userId) {
-            return res.status(400).json({ message: "UserId es requerido" });
-        }
-        const pendings = await pendingRepository.getAllByUser(userId);
-        res.status(200).json({ pendings });
-    } catch (error) {
-        throw createError("No pudo obtener los pendientes del usuario", 500);
+  try {
+    const pendingRepository = new PendingRepository();
+    const authUserId = getAuthenticatedUserId(req);
+    const { userId } = req.params;
+
+    if (validateAuthenticated(res, authUserId)) return;
+
+    if (String(authUserId) !== String(userId)) {
+      return res.status(403).json({ message: PENDING_ERRORS.FORBIDDEN_USER_PENDINGS });
     }
-}
+
+    const pendings = await pendingRepository.getAllByUser(authUserId);
+    return res.status(200).json({ pendings });
+  } catch (error) {
+    throw createError(PENDING_ERRORS.GET_BY_USER_FAILED, 500);
+  }
+};
 
 export const updatePending = async (req, res) => {
-    try {
-        const pendingRepository = new pendingMongoRepository();
-        const { id } = req.params;
-        const updateData = req.body;
-        const updatedPending = await pendingRepository.updatePending({ _id: id, ...updateData });
-        if (!updatedPending) {
-            return res.status(404).json({ message: "Pendiente no encontrado o no se pudo actualizar" });
-        }
-        res.status(200).json(updatedPending);
-    } catch (error) {
-        throw createError("No pudo actualizar el pendiente", 500);
+  try {
+    const pendingRepository = new PendingRepository();
+    const userId = getAuthenticatedUserId(req);
+    const { id } = req.params;
+    const updateData = req.body || {};
+
+    if (validateAuthenticated(res, userId)) return;
+
+    const currentPending = await pendingRepository.getByIdForUser(id, userId);
+    if (!currentPending) {
+      return res.status(404).json({ message: PENDING_ERRORS.NOT_FOUND_OR_UPDATE_FAILED });
     }
-}
+
+    const { payload, assignedTo, collaborators } = buildUpdatePendingPayload({
+      currentPending,
+      updateData,
+      userId,
+    });
+
+    if (!collaborators.length) {
+      return res.status(400).json({ message: PENDING_ERRORS.MIN_ONE_COLLABORATOR });
+    }
+
+    if (!assignedTo) {
+      return res.status(400).json({ message: PENDING_ERRORS.ASSIGNED_REQUIRED });
+    }
+
+    if (!isAssignedWithinCollaborators({ assignedTo, collaborators })) {
+      return res.status(400).json({ message: PENDING_ERRORS.ASSIGNED_NOT_COLLABORATOR });
+    }
+
+    const updatedPending = await pendingRepository.updateByIdForUser(id, userId, payload);
+    if (!updatedPending) {
+      return res.status(404).json({ message: PENDING_ERRORS.NOT_FOUND_OR_UPDATE_FAILED });
+    }
+
+    return res.status(200).json({ pending: updatedPending });
+  } catch (error) {
+    throw createError(PENDING_ERRORS.UPDATE_FAILED, 500);
+  }
+};
 
 export const deletePending = async (req, res) => {
-    try {
-        const pendingRepository = new pendingMongoRepository();
-        const { id } = req.params;
-        const deletedPending = await pendingRepository.deleteById({ _id: id });
-        if (!deletedPending) {
-            return res.status(404).json({ message: "Pendiente no encontrado o no se pudo eliminar" });
-        }
-        res.status(200).json({ message: "Pendiente eliminado correctamente" });
-    } catch (error) {
-        throw createError("No pudo eliminar el pendiente", 500);
+  try {
+    const pendingRepository = new PendingRepository();
+    const userId = getAuthenticatedUserId(req);
+    const { id } = req.params;
+
+    if (validateAuthenticated(res, userId)) return;
+
+    const deletedPending = await pendingRepository.deleteByIdForUser(id, userId);
+    if (!deletedPending) {
+      return res.status(404).json({ message: PENDING_ERRORS.NOT_FOUND_OR_DELETE_FAILED });
     }
-}
+
+    return res.status(200).json({ message: 'Pendiente eliminado correctamente' });
+  } catch (error) {
+    throw createError(PENDING_ERRORS.DELETE_FAILED, 500);
+  }
+};

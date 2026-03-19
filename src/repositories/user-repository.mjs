@@ -1,4 +1,4 @@
-import User from '../model/user.mjs';
+import User from '../model/user-schema.mjs';
 
 export default class UserMongoRepository {
 
@@ -27,14 +27,14 @@ export default class UserMongoRepository {
 
     async updateById(id, data) {
         try {
-            await User.findByIdAndUpdate(id, data);
+            return await User.findByIdAndUpdate(id, data, { new: true, runValidators: true });
         } catch (err) {
             throw new Error('Error updating user: ' + err.message);
         }
     }
     async deleteById(id) {
         try {
-            await User.findByIdAndDelete(id);
+            return await User.findByIdAndDelete(id);
         } catch (err) {
             throw new Error('Error deleting user: ' + err.message);
         }

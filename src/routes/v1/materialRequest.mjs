@@ -5,20 +5,17 @@ import {
     deleteMaterialRequest,
     updateMaterialRequest,
     getAllMaterialRequests,
-    updateMaterialRequestStatus,
-    updateMaterialRequestPriority,
-    updateMaterialRequestAssigned
+    updateMaterialRequestStatus
 } from "../../controllers/materialRequest-controller.mjs";
+import { auth } from "../../middleware/auth-middleware.mjs";
 
 const routes = express.Router();
 
-routes.post("/", createMaterialRequest);
-routes.get("/", getAllMaterialRequests);
-routes.get("/:id", getMaterialRequestById);
-routes.put("/:id", updateMaterialRequest);
-routes.patch("/:id/status", updateMaterialRequestStatus);
-routes.patch("/:id/priority", updateMaterialRequestPriority);
-routes.patch("/:id/assigned", updateMaterialRequestAssigned);
-routes.delete("/:id", deleteMaterialRequest);
+routes.post("/", auth, createMaterialRequest);
+routes.get("/", auth, getAllMaterialRequests);
+routes.get("/:id", auth, getMaterialRequestById);
+routes.put("/:id", auth, updateMaterialRequest);
+routes.patch("/:id/status", auth, updateMaterialRequestStatus);
+routes.delete("/:id", auth, deleteMaterialRequest);
 
 export default routes;

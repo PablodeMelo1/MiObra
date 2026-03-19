@@ -1,4 +1,4 @@
-import Comment from '../model/comment.mjs';
+import Comment from '../model/comment-schema.mjs';
 
 export default class commentMongoRepository {
     async createOne(data) {

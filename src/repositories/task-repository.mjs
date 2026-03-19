@@ -1,4 +1,4 @@
-import Task from '../model/task.mjs'
+import Task from '../model/task-schema.mjs'
 
 export default class taskMongoRepository {
 
@@ -7,6 +7,7 @@ export default class taskMongoRepository {
             const newTask = new Task(data);
             const task = await newTask.save();
             console.log('Task created:', task);
+            return task;
         } catch (error) {
             throw new Error('error creating a tast');
         }
@@ -34,8 +35,9 @@ export default class taskMongoRepository {
     }
 
     async getByIdAndProject(data) {
-        const { _id, project } = data;
-        return Task.findOne({ _id, project });
+        const { _id, project, projectId } = data;
+        const effectiveProjectId = projectId || project;
+        return Task.findOne({ _id, projectId: effectiveProjectId });
     }
 
     async deleteById(data) {

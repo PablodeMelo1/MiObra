@@ -7,14 +7,15 @@ import {
     getAllSuppliers,
     searchSuppliersByName
 } from "../../controllers/supplier-controller.mjs";
+import { auth } from "../../middleware/auth-middleware.mjs";
 
 const routes = express.Router();
 
-routes.post("/", createSupplier);
-routes.get("/", getAllSuppliers);
-routes.get("/search", searchSuppliersByName);
-routes.get("/:id", getSupplierById);
-routes.put("/:id", updateSupplier);
-routes.delete("/:id", deleteSupplier);
+routes.post("/", auth, createSupplier);
+routes.get("/", auth, getAllSuppliers);
+routes.get("/search", auth, searchSuppliersByName);
+routes.get("/:id", auth, getSupplierById);
+routes.put("/:id", auth, updateSupplier);
+routes.delete("/:id", auth, deleteSupplier);
 
 export default routes;

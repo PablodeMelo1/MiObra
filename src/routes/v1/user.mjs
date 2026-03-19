@@ -4,15 +4,23 @@ import {
     loginUser,
     getUserById,
     updateUser,
-    deleteUser
+    deleteUser,
+    getAll,
+    changeUserRole
 } from "../../controllers/user-controller.mjs";
+import { auth } from "../../middleware/auth-middleware.mjs";
+import { requireRole } from "../../middleware/role-middleware.mjs";
+import { userRoles } from "../../constants/userRole.mjs";
+
 
 const routes = express.Router();
 
-routes.post("/", createUser);
-routes.post("/login", loginUser);
-routes.get("/:id", getUserById);
-routes.put("/:id", updateUser);
-routes.delete("/:id", deleteUser);
+routes.get("/", auth, getAll);
+routes.get("/:id", auth, getUserById);
+routes.put("/:id", auth, updateUser);
+routes.delete("/:id", auth, deleteUser);
+
+// Solo el admin puede cambiar el rol de un usuario
+routes.patch("/:id/role", auth, requireRole(userRoles.ADMIN), changeUserRole);
 
 export default routes;
