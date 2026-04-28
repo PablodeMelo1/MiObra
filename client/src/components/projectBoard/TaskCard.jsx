@@ -1,4 +1,4 @@
-import { toInputDate } from './boardUtils';
+import { getTaskStatusLabel, toInputDate } from './boardUtils';
 
 function TaskCard({ task, onDragStart, onEdit, onDelete, assignedLabel }) {
   return (
@@ -32,7 +32,9 @@ function TaskCard({ task, onDragStart, onEdit, onDelete, assignedLabel }) {
       </p>
 
       <div className="mt-2 grid grid-cols-2 gap-1 text-[10px] text-white/55">
-        <span className="rounded border border-white/10 px-1.5 py-0.5">{task.status || 'PENDING'}</span>
+        <span className="rounded border border-white/10 px-1.5 py-0.5">
+          {getTaskStatusLabel(task.status)}
+        </span>
         <span className="rounded border border-white/10 px-1.5 py-0.5">{task.priority || 'MEDIUM'}</span>
         <span className="col-span-2 truncate rounded border border-white/10 px-1.5 py-0.5">
           {task.assignedTo ? `Asignado: ${assignedLabel}` : 'Sin asignar'}

@@ -1,13 +1,4 @@
-import { MATERIAL_REQUEST_FILTER_OPTIONS } from '../../constants/materialRequest';
-
-function MaterialRequestHeader({ onOpenCreate, statusFilter, onStatusFilterChange }) {
-  const getFilterClass = (value) =>
-    `rounded border px-2.5 py-1 text-xs transition ${
-      statusFilter === value
-        ? 'border-white/30 bg-white/15 text-white'
-        : 'border-white/20 text-white/70 hover:bg-white/10'
-    }`;
-
+function MaterialRequestHeader({ onOpenCreate }) {
   return (
     <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
       <div>

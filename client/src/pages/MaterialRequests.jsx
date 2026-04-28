@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/sidebar';
-import { useAuth } from '../context/AuthContext';
+import LoadingScreen from '../components/routing/LoadingScreen';
+import { useAuth } from '../context/auth-context';
 import MaterialRequestHeader from '../components/materialRequests/MaterialRequestHeader';
 import MaterialRequestTable from '../components/materialRequests/MaterialRequestTable';
 import MaterialRequestFormModal from '../components/materialRequests/MaterialRequestFormModal';
@@ -197,7 +198,7 @@ function MaterialRequests() {
     }
   };
 
-  if (isLoading || loadingData) return null;
+  if (isLoading || loadingData) return <LoadingScreen message="Cargando peticiones..." />;
 
   return (
     <div className="min-h-screen bg-[#0c0f14] text-white">

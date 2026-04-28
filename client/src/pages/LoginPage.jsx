@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/auth-context'
 
 function LoginPage() {
   const { handleSubmit, register } = useForm();
@@ -14,11 +14,7 @@ function LoginPage() {
   useEffect(() => {
     if (isLoading) return;
     if (isAuthenticated) {
-      setMessage("Sesión verificada, redirigiendo...");
-      setErrorMessage("");
       navigate("/dashboard");
-    } else {
-      setMessage("");
     }
   }, [isAuthenticated, isLoading, navigate]);
 

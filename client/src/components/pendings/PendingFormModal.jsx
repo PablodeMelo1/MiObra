@@ -12,12 +12,12 @@ function PendingFormModal({
   onChange,
   onSubmit,
 }) {
-  if (!isOpen) return null;
-
   const collaboratorUsers = useMemo(
-    () => users.filter((user) => form.collaborators.includes(String(user._id || user.id))),
+    () => users.filter((user) => (form.collaborators ?? []).includes(String(user._id || user.id))),
     [form.collaborators, users],
   );
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/65 p-3">

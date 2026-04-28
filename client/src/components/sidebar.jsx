@@ -1,18 +1,18 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/auth-context';
 
 
 const mainItems = [
-    { id: 'projects', label: 'Proyectos', component: "Projects", icon: 'fa-solid fa-list-check' },
-    { id: 'pendings', label: 'Pendientes', component: "pendings", icon: 'fa-regular fa-clock' },
-    { id: 'inventory', label: 'Inventario', component: "Inventory", icon: 'fa-solid fa-screwdriver-wrench' },
-    { id: 'material-requests', label: 'Peticiones de materiales', component: "material-requests", icon: 'fa-regular fa-calendar' },
-    { id: 'suppliers', label: 'Proveedores', component: "suppliers", icon: 'fa-solid fa-truck-field-un' },
+    { id: 'projects', label: 'Proyectos', path: '/projects', icon: 'fa-solid fa-list-check' },
+    { id: 'pendings', label: 'Pendientes', path: '/pendings', icon: 'fa-regular fa-clock' },
+    { id: 'inventory', label: 'Inventario', path: '/inventory', icon: 'fa-solid fa-screwdriver-wrench' },
+    { id: 'inventory-history', label: 'Historial inventario', path: '/inventory/history', icon: 'fa-solid fa-timeline' },
+    { id: 'material-requests', label: 'Peticiones de materiales', path: '/material-requests', icon: 'fa-regular fa-calendar' },
+    { id: 'suppliers', label: 'Proveedores', path: '/suppliers', icon: 'fa-solid fa-truck-field-un' },
 ]
 
 const settingsItems = [
-    { id: 'settings', label: 'Settings', component: "settings", icon: 'fa-solid fa-gears' },
+    { id: 'settings', label: 'Settings', path: '/settings', icon: 'fa-solid fa-gears' },
 ]
 
 const Icon = ({ name, active }) => {
@@ -21,11 +21,16 @@ const Icon = ({ name, active }) => {
 }
 
 function Sidebar() {
-    const [activeItem, setActiveItem] = useState('refunds')
     const navigate = useNavigate();
+    const location = useLocation();
     const { user, isLoading, signOut } = useAuth();
-    console.log('user: ', user)
+    const items = [...mainItems, ...settingsItems];
+    const activeItem = items
+        .filter((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))
+        .sort((a, b) => b.path.length - a.path.length)[0]?.id || 'dashboard';
+
     if (isLoading) return null;
+
     return (
         <aside className="relative w-75 rounded-2xl border border-white/5 bg-linear-to-b from-[#1d222d] via-[#151922] to-[#0f131b] px-4 pb-5 pt-6 text-white shadow-[0_20px_60px_rgba(0,0,0,0.45)] transition-all duration-300">
             <div className="text-center mb-5 gap-3 border-b border-white/10 pb-3">
@@ -53,7 +58,7 @@ function Sidebar() {
                 {mainItems.map((item) => (
                     <button
                         key={item.id}
-                        onClick={() => { setActiveItem(item.id); navigate(`/${item.component}`) }}
+                        onClick={() => navigate(item.path)}
                         className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${activeItem === item.id
                             ? 'bg-white/10 text-white'
                             : 'text-white/70 hover:bg-white/5'
@@ -72,7 +77,7 @@ function Sidebar() {
                 {settingsItems.map((item) => (
                     <button
                         key={item.id}
-                        onClick={() => { setActiveItem(item.id); navigate(`/${item.component}`) }}
+                        onClick={() => navigate(item.path)}
                         className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${activeItem === item.id
                             ? 'bg-white/10 text-white'
                             : 'text-white/70 hover:bg-white/5'

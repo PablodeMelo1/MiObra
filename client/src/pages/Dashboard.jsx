@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/sidebar'
-import { useAuth } from '../context/AuthContext'
+import LoadingScreen from '../components/routing/LoadingScreen'
+import { useAuth } from '../context/auth-context'
 
 function Dashboard() {
 	const navigate = useNavigate()
@@ -14,7 +15,7 @@ function Dashboard() {
 		}
 	}, [isAuthenticated, isLoading, navigate])
 
-	if (isLoading) return null
+	if (isLoading) return <LoadingScreen message="Cargando dashboard..." />
 
 	return (
 		<div className="min-h-screen bg-[#0c0f14] text-white">

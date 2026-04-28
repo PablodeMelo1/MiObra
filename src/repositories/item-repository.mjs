@@ -72,4 +72,20 @@ export default class itemMongoRepository {
         }
     }
 
+    async incrementStock(id, amount) {
+        try {
+            const value = Math.abs(Number(amount) || 0);
+            return await Item.findByIdAndUpdate(
+                id,
+                {
+                    $inc: { totalQuantity: value, availableQuantity: value },
+                    updatedAt: Date.now(),
+                },
+                { new: true }
+            );
+        } catch (err) {
+            throw new Error('Error incrementing stock: ' + err.message);
+        }
+    }
+
 }
