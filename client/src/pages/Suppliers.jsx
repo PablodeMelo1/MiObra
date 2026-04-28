@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/sidebar';
+import LoadingScreen from '../components/routing/LoadingScreen';
 import SupplierHeader from '../components/suppliers/SupplierHeader';
 import SupplierTable from '../components/suppliers/SupplierTable';
 import SupplierFormModal from '../components/suppliers/SupplierFormModal';
 import DeleteSupplierModal from '../components/suppliers/DeleteSupplierModal';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/auth-context';
 import {
   createSupplier,
   deleteSupplier,
@@ -48,7 +49,7 @@ function Suppliers() {
     [formModal.supplierId, suppliers],
   );
 
-  const loadSuppliers = async (searchTerm = '') => {
+  const loadSuppliers = useCallback(async (searchTerm = '') => {
     try {
       setLoadingSuppliers(true);
       setErrorMessage('');
@@ -65,7 +66,7 @@ function Suppliers() {
     } finally {
       setLoadingSuppliers(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (isLoading) return;
@@ -75,7 +76,7 @@ function Suppliers() {
     }
 
     loadSuppliers();
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, isLoading, loadSuppliers, navigate]);
 
   useEffect(() => {
     if (!isAuthenticated || isLoading) return;
@@ -85,7 +86,7 @@ function Suppliers() {
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [searchValue]);
+  }, [isAuthenticated, isLoading, loadSuppliers, searchValue]);
 
   const handleSupplierFormChange = (field, value) => {
     setFormError('');
@@ -175,7 +176,7 @@ function Suppliers() {
     }
   };
 
-  if (isLoading || loadingSuppliers) return null;
+  if (isLoading || loadingSuppliers) return <LoadingScreen message="Cargando proveedores..." />;
 
   return (
     <div className="min-h-screen bg-[#0c0f14] text-white">

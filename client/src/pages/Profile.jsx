@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/sidebar';
+import LoadingScreen from '../components/routing/LoadingScreen';
 import ProfileForm from '../components/profile/ProfileForm';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/auth-context';
 import { getUserProfile, updateUserProfile } from '../api/user';
 
 function Profile() {
@@ -84,7 +85,7 @@ function Profile() {
     }
   };
 
-  if (isLoading || loadingProfile) return null;
+  if (isLoading || loadingProfile) return <LoadingScreen message="Cargando perfil..." />;
 
   return (
     <div className="min-h-screen bg-[#0c0f14] text-white">

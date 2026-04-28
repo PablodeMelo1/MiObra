@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/sidebar';
-import { useAuth } from '../context/AuthContext';
+import LoadingScreen from '../components/routing/LoadingScreen';
+import { useAuth } from '../context/auth-context';
 import PendingHeader from '../components/pendings/PendingHeader';
 import PendingList from '../components/pendings/PendingList';
 import PendingFormModal from '../components/pendings/PendingFormModal';
@@ -201,7 +202,7 @@ function Pendings() {
     }
   };
 
-  if (isLoading || loadingPendings) return null;
+  if (isLoading || loadingPendings) return <LoadingScreen message="Cargando pendientes..." />;
 
   return (
     <div className="min-h-screen bg-[#0c0f14] text-white">

@@ -1,4 +1,4 @@
-import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS } from './boardUtils';
+import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS, getTaskStatusLabel } from './boardUtils';
 
 function TaskModal({
   isOpen,
@@ -71,10 +71,9 @@ function TaskModal({
                 <span className="text-white/70">Descripcion</span>
                 <textarea
                   value={form.description}
-                  onChange={(event) => onChange('description', event.target.value)}
+                  onChange={(event) => onChange('description', event.taraddget.value)}
                   rows={3}
                   className="w-full resize-none rounded border border-white/15 bg-[#0d1119] px-2 py-1.5 text-white outline-none focus:border-white/30"
-                  required
                 />
               </label>
 
@@ -118,7 +117,7 @@ function TaskModal({
                 >
                   {TASK_STATUS_OPTIONS.map((status) => (
                     <option key={status} value={status}>
-                      {status}
+                      {getTaskStatusLabel(status)}
                     </option>
                   ))}
                 </select>
@@ -149,23 +148,27 @@ function TaskModal({
                 />
               </label>
 
-              <label className="space-y-1">
-                <span className="text-white/50">ProjectId</span>
-                <input
-                  value={form.projectId}
-                  readOnly
-                  className="w-full rounded border border-white/10 bg-[#090d14] px-2 py-1.5 text-white/50"
-                />
-              </label>
+              {mode !== 'create' ? (
+                <>
+                  <label className="space-y-1">
+                    <span className="text-white/50">ProjectId</span>
+                    <input
+                      value={form.projectId}
+                      readOnly
+                      className="w-full rounded border border-white/10 bg-[#090d14] px-2 py-1.5 text-white/50"
+                    />
+                  </label>
 
-              <label className="space-y-1">
-                <span className="text-white/50">CreatedAt</span>
-                <input
-                  value={form.createdAt || 'Se asigna automaticamente'}
-                  readOnly
-                  className="w-full rounded border border-white/10 bg-[#090d14] px-2 py-1.5 text-white/50"
-                />
-              </label>
+                  <label className="space-y-1">
+                    <span className="text-white/50">CreatedAt</span>
+                    <input
+                      value={form.createdAt || 'Se asigna automaticamente'}
+                      readOnly
+                      className="w-full rounded border border-white/10 bg-[#090d14] px-2 py-1.5 text-white/50"
+                    />
+                  </label>
+                </>
+              ) : null}
 
               {referenceTask ? (
                 <label className="col-span-2 space-y-1">

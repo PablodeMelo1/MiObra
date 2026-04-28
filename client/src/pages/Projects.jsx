@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/sidebar';
-import { useAuth } from '../context/AuthContext';
+import LoadingScreen from '../components/routing/LoadingScreen';
+import { useAuth } from '../context/auth-context';
 import { createProject, getProjects } from '../api/projects';
 import CreateProjectModal from '../components/projects/CreateProjectModal';
 import ProjectsHeader from '../components/projects/ProjectsHeader';
@@ -46,7 +47,7 @@ function Projects() {
     fetchProjects();
   }, [isAuthenticated, isLoading, navigate]);
 
-  if (isLoading || loadingProjects) return null;
+  if (isLoading || loadingProjects) return <LoadingScreen message="Cargando proyectos..." />;
 
   const handleProjectFormChange = (field, value) => {
     setProjectForm((prev) => ({ ...prev, [field]: value }));

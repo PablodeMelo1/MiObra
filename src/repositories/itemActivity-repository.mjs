@@ -11,34 +11,66 @@ export default class itemActivityMongoRepository {
         }
     }
 
-    async findOpenActivityByItemAndUser(itemId, userId, zoneId = null) {
-        const query = { itemId, userId, status: 'OPEN' };
+    async findByItemAndUser(itemId, userId, zoneId = null) {
+        const query = { itemId, userId };
         if (zoneId) query.zoneId = zoneId;
         return await ItemActivity.findOne(query);
     }
 
-    async updateRemainingQuantity(activityId, newRemaining) {
+    async applyCheckout(activityId, amount) {
         try {
             return await ItemActivity.findByIdAndUpdate(
                 activityId,
-                { remainingQuantity: newRemaining },
+                {
+                    $inc: {
+                        quantity: Math.abs(amount),
+                        remainingQuantity: Math.abs(amount),
+                    },
+                    status: 'OPEN',
+                    type: 'CHECK_OUT',
+                    updatedAt: Date.now(),
+                },
                 { new: true }
             );
         } catch (err) {
-            throw new Error('Error updating remaining quantity: ' + err.message);
+            throw new Error('Error applying checkout movement: ' + err.message);
         }
     }
 
-    async closeActivity(activityId) {
+    async applyCheckin(activityId, amount, nextStatus = 'OPEN') {
         try {
             return await ItemActivity.findByIdAndUpdate(
                 activityId,
-                { status: 'CLOSED' },
+                {
+                    $inc: {
+                        quantity: -Math.abs(amount),
+                        remainingQuantity: -Math.abs(amount),
+                    },
+                    status: nextStatus,
+                    type: 'CHECK_IN',
+                    updatedAt: Date.now(),
+                },
                 { new: true }
             );
         } catch (err) {
-            throw new Error('Error closing activity: ' + err.message);
+            throw new Error('Error applying checkin movement: ' + err.message);
         }
+    }
+
+    async deleteById(activityId) {
+        try {
+            return await ItemActivity.findByIdAndDelete(activityId);
+        } catch (err) {
+            throw new Error('Error deleting item activity: ' + err.message);
+        }
+    }
+
+    async getByItemId(itemId, limit = 200) {
+        return ItemActivity.find({ itemId })
+            .sort({ updatedAt: -1 })
+            .limit(limit)
+            .populate('userId', 'name email')
+            .populate('itemId', 'name itemType');
     }
 
 }

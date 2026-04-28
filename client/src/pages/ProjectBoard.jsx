@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../components/sidebar';
+import LoadingScreen from '../components/routing/LoadingScreen';
 import { getProjectById, updateProject } from '../api/projects';
 import {
   createTask,
@@ -11,7 +12,7 @@ import {
 } from '../api/tasks';
 import { getUsers } from '../api/user';
 import { createProjectMember, getProjectMembers } from '../api/projectMembers';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/auth-context';
 import BoardHeader from '../components/projectBoard/BoardHeader';
 import BoardColumn from '../components/projectBoard/BoardColumn';
 import ProjectSettingsModal from '../components/projectBoard/ProjectSettingsModal';
@@ -163,6 +164,25 @@ function ProjectBoard() {
     });
   }, [project]);
 
+  useEffect(() => {
+    if (!boardMessage) return undefined;
+
+    const timeout = window.setTimeout(() => {
+      setBoardMessage('');
+    }, 4500);
+
+    return () => window.clearTimeout(timeout);
+  }, [boardMessage]);
+
+  const clearBoardMessage = () => {
+    setBoardMessage('');
+  };
+
+  const handleNewListNameChange = (value) => {
+    clearBoardMessage();
+    setNewListName(value);
+  };
+
   const reorderColumns = async (sourceListName, targetListName) => {
     if (sourceListName === targetListName) return;
 
@@ -294,6 +314,7 @@ function ProjectBoard() {
   };
 
   const openRenameColumnModal = (listName) => {
+    clearBoardMessage();
     setRenameColumnModal({
       isOpen: true,
       currentName: listName,
@@ -302,6 +323,7 @@ function ProjectBoard() {
   };
 
   const closeRenameColumnModal = () => {
+    clearBoardMessage();
     setRenameColumnModal({ isOpen: false, currentName: '', nextName: '' });
   };
 
@@ -347,10 +369,18 @@ function ProjectBoard() {
     }
   };
 
-  const openProjectSettings = () => setProjectSettingsOpen(true);
-  const closeProjectSettings = () => setProjectSettingsOpen(false);
+  const openProjectSettings = () => {
+    clearBoardMessage();
+    setProjectSettingsOpen(true);
+  };
+
+  const closeProjectSettings = () => {
+    clearBoardMessage();
+    setProjectSettingsOpen(false);
+  };
 
   const handleNewMemberChange = (field, value) => {
+    clearBoardMessage();
     setNewMember((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -382,6 +412,7 @@ function ProjectBoard() {
   };
 
   const handleProjectFormChange = (field, value) => {
+    clearBoardMessage();
     setProjectForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -415,6 +446,7 @@ function ProjectBoard() {
   };
 
   const openCreateTaskModal = (listName) => {
+    clearBoardMessage();
     setTaskForm({
       projectId,
       title: '',
@@ -430,6 +462,7 @@ function ProjectBoard() {
   };
 
   const openEditTaskModal = (task) => {
+    clearBoardMessage();
     setTaskForm({
       projectId,
       title: task.title || '',
@@ -445,14 +478,17 @@ function ProjectBoard() {
   };
 
   const openDeleteTaskModal = (task) => {
+    clearBoardMessage();
     setTaskModal({ isOpen: true, mode: 'delete', taskId: task._id || task.id, list: task.list });
   };
 
   const closeTaskModal = () => {
+    clearBoardMessage();
     setTaskModal({ isOpen: false, mode: 'create', taskId: '', list: '' });
   };
 
   const handleTaskFormChange = (field, value) => {
+    clearBoardMessage();
     setTaskForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -506,7 +542,7 @@ function ProjectBoard() {
     }
   };
 
-  if (isLoading || loadingData) return null;
+  if (isLoading || loadingData) return <LoadingScreen message="Cargando tablero..." />;
 
   if (errorMessage) {
     return (
@@ -531,7 +567,7 @@ function ProjectBoard() {
               boardMessage={boardMessage}
               newListName={newListName}
               onOpenProjectSettings={openProjectSettings}
-              onNewListNameChange={setNewListName}
+              onNewListNameChange={handleNewListNameChange}
               onAddList={handleAddList}
             />
 
@@ -590,7 +626,10 @@ function ProjectBoard() {
         currentName={renameColumnModal.currentName}
         nextName={renameColumnModal.nextName}
         onClose={closeRenameColumnModal}
-        onChange={(value) => setRenameColumnModal((prev) => ({ ...prev, nextName: value }))}
+        onChange={(value) => {
+          clearBoardMessage();
+          setRenameColumnModal((prev) => ({ ...prev, nextName: value }));
+        }}
         onSubmit={handleRenameColumnSubmit}
       />
     </div>

@@ -1,15 +1,6 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { registerRequest, loginRequest, verifySessionRequest, logoutRequest } from '../api/auth';
-
-export const AuthContext = createContext();
-
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
-}
+import { AuthContext } from './auth-context';
 
 export const AuthProvider = ({children}) => {
     const [user, setUser] = useState(null);
@@ -26,7 +17,7 @@ export const AuthProvider = ({children}) => {
                 if (!isMounted) return;
                 setUser(response.data?.user ?? response.data);
                 setIsAuthenticated(true);
-            } catch (error) {
+            } catch {
                 if (!isMounted) return;
                 setUser(null);
                 setIsAuthenticated(false);
@@ -57,7 +48,7 @@ export const AuthProvider = ({children}) => {
             const sessionResponse = await verifySessionRequest();
             setUser(sessionResponse.data?.user ?? sessionResponse.data);
             setIsAuthenticated(true);
-        } catch (error) {
+        } catch {
             setUser(null);
             setIsAuthenticated(false);
         } finally {

@@ -1,6 +1,18 @@
 export const TASK_STATUS_OPTIONS = ['PENDING', 'IN_PROGRESS', 'BLOCKED', 'PAUSED', 'COMPLETED'];
 export const TASK_PRIORITY_OPTIONS = ['URGENT', 'HIGH', 'MEDIUM', 'LOW'];
 
+export const TASK_STATUS_LABELS = {
+  PENDING: 'Pendiente',
+  IN_PROGRESS: 'En progreso',
+  BLOCKED: 'Bloqueada',
+  PAUSED: 'Pausada',
+  COMPLETED: 'Finalizada',
+};
+
+export function getTaskStatusLabel(status) {
+  return TASK_STATUS_LABELS[status] || status || 'Pendiente';
+}
+
 export function groupTasksByList(tasks, lists) {
   const grouped = {};
 
