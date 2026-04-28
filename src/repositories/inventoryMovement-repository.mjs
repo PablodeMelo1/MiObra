@@ -6,6 +6,7 @@ export default class inventoryMovementMongoRepository {
         return movement.save();
     }
 
+    
     async getAll(limit = 500) {
         return InventoryMovement.find({})
             .sort({ createdAt: -1 })
