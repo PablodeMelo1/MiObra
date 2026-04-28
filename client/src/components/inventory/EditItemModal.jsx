@@ -4,7 +4,7 @@ function EditItemModal({ isOpen, form, error, onChange, onClose, onSubmit }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-3">
+    <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/70 p-3 sm:p-4">
       <form
         onSubmit={onSubmit}
         className="w-full max-w-xl rounded-2xl border border-white/10 bg-[#101722] p-4"
@@ -40,7 +40,7 @@ function EditItemModal({ isOpen, form, error, onChange, onClose, onSubmit }) {
             </div>
           </label>
 
-          <label className="text-sm text-white/80 md:col-span-2">
+          <label className="text-sm text-white/80 md:sm:col-span-2">
             Descripcion
             <textarea
               value={form.description}

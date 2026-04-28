@@ -1,7 +1,7 @@
 function InventoryTable({ items, getItemTypeLabel, onOpenDetails, onOpenEdit, onDelete }) {
   return (
     <div className="mb-4 overflow-x-auto rounded-2xl border border-white/10 bg-[#111723] p-2">
-      <table className="min-w-full border-collapse text-sm">
+      <table className="min-w-[680px] border-collapse text-sm">
         <thead>
           <tr className="border-b border-white/10 text-left text-white/60">
             <th className="px-2 py-2">Nombre</th>

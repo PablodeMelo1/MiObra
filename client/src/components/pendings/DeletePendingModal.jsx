@@ -2,7 +2,7 @@ function DeletePendingModal({ isOpen, pendingTitle, onClose, onConfirm }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/65 p-3">
+    <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/65 p-3 sm:p-4">
       <div className="w-full max-w-md rounded-xl border border-cyan-300/20 bg-[#0f1724] p-4 text-white shadow-2xl">
         <h3 className="text-sm font-semibold">Eliminar pendiente</h3>
         <p className="mt-2 text-xs text-white/70">

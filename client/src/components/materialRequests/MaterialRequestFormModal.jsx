@@ -17,7 +17,7 @@ function MaterialRequestFormModal({
   const isEditMode = mode === 'edit';
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/65 p-3">
+    <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/65 p-3 sm:p-4">
       <div className="w-full max-w-2xl rounded-xl border border-white/15 bg-[#111722] p-4 text-white shadow-2xl">
         <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
           <h3 className="text-sm font-semibold">{mode === 'create' ? 'Nueva peticion' : 'Editar peticion'}</h3>
@@ -31,7 +31,7 @@ function MaterialRequestFormModal({
         </div>
 
         <form className="space-y-3 text-xs" onSubmit={onSubmit}>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <label className="space-y-1">
               <span className="text-white/70">Material</span>
               <input
@@ -54,7 +54,7 @@ function MaterialRequestFormModal({
               />
             </label>
 
-            <label className="col-span-2 space-y-1">
+            <label className="sm:col-span-2 space-y-1">
               <span className="text-white/70">Solicitado por</span>
               <input
                 value={requesterName || 'Usuario'}
@@ -63,7 +63,7 @@ function MaterialRequestFormModal({
               />
             </label>
 
-            <label className="col-span-2 space-y-1">
+            <label className="sm:col-span-2 space-y-1">
               <span className="text-white/70">Descripcion</span>
               <textarea
                 value={form.description}
@@ -128,7 +128,7 @@ function MaterialRequestFormModal({
               </>
             ) : null}
 
-            <label className="col-span-2 space-y-1">
+            <label className="sm:col-span-2 space-y-1">
               <span className="text-white/70">Proyecto (opcional)</span>
               <select
                 value={form.projectId}
@@ -144,7 +144,7 @@ function MaterialRequestFormModal({
               </select>
             </label>
 
-            <div className="col-span-2 rounded border border-white/10 bg-[#0f1420] p-2">
+            <div className="sm:col-span-2 rounded border border-white/10 bg-[#0f1420] p-2">
               <p className="mb-2 text-[11px] uppercase tracking-wide text-white/55">Dimensiones opcionales</p>
               <div className="grid grid-cols-3 gap-2">
                 <label className="space-y-1">

@@ -4,7 +4,7 @@ import { formatDate, getLabel } from './utils';
 function InventoryHistoryTable({ activities }) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-white/10 bg-[#111723] p-2">
-      <table className="min-w-full border-collapse text-sm">
+      <table className="min-w-[760px] border-collapse text-sm">
         <thead>
           <tr className="border-b border-white/10 text-left text-white/60">
             <th className="px-2 py-2">Fecha</th>

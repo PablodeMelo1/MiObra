@@ -6,12 +6,12 @@ function SupplierHeader({ searchValue, onSearchChange, onOpenCreate }) {
         <p className="text-xs text-white/60">Gestion completa de proveedores</p>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
         <input
           value={searchValue}
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder="Buscar por nombre"
-          className="w-52 rounded border border-white/15 bg-[#0d1119] px-2 py-1.5 text-xs text-white outline-none placeholder:text-white/35 focus:border-white/30"
+          className="w-full rounded border border-white/15 bg-[#0d1119] px-2 py-1.5 text-xs text-white outline-none placeholder:text-white/35 focus:border-white/30 sm:w-52"
         />
         <button
           type="button"

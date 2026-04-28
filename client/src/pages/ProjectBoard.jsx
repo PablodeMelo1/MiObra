@@ -547,7 +547,7 @@ function ProjectBoard() {
   if (errorMessage) {
     return (
       <div className="min-h-screen bg-[#0c0f14] text-white">
-        <div className="flex min-h-screen items-start gap-4 px-6 py-5">
+        <div className="flex min-h-screen flex-col items-stretch gap-4 px-3 py-3 sm:px-5 lg:flex-row lg:items-start lg:px-6 lg:py-5">
           <Sidebar />
           <p className="mt-5 text-white/70">{errorMessage}</p>
         </div>
@@ -557,10 +557,10 @@ function ProjectBoard() {
 
   return (
     <div className="min-h-screen bg-[#0c0f14] text-white">
-      <div className="flex min-h-screen items-start gap-4 px-6 py-5">
+      <div className="flex min-h-screen flex-col items-stretch gap-4 px-3 py-3 sm:px-5 lg:flex-row lg:items-start lg:px-6 lg:py-5">
         <Sidebar />
 
-        <section className="flex-1 p-3">
+        <section className="min-w-0 flex-1 p-0 sm:p-3">
           <div className="min-h-screen rounded-xl border border-white/10 bg-[#10141d] p-3 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
             <BoardHeader
               project={project}

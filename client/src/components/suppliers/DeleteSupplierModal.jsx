@@ -2,7 +2,7 @@ function DeleteSupplierModal({ isOpen, supplierName, onClose, onConfirm }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/65 p-3">
+    <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/65 p-3 sm:p-4">
       <div className="w-full max-w-md rounded-xl border border-white/15 bg-[#111722] p-4 text-white shadow-2xl">
         <h3 className="text-sm font-semibold">Eliminar proveedor</h3>
         <p className="mt-2 text-xs text-white/70">

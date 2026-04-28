@@ -9,7 +9,7 @@ function InventoryHeader({ query, onQueryChange, typeFilter, onTypeFilterChange,
           <p className="text-xs text-white/60">Listado de items. Entrando a cada uno ves toda la info y su historial.</p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 self-start">
+        <div className="flex w-full flex-col gap-2 self-start sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
           <button
             type="button"
             onClick={onOpenHistory}
@@ -27,18 +27,18 @@ function InventoryHeader({ query, onQueryChange, typeFilter, onTypeFilterChange,
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <input
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
-          className="min-w-55 flex-1 rounded-md border border-white/15 bg-black/20 px-3 py-2 text-sm outline-none focus:border-cyan-300/60"
+          className="w-full flex-1 rounded-md border border-white/15 bg-black/20 px-3 py-2 text-sm outline-none focus:border-cyan-300/60 sm:min-w-55"
           placeholder="Buscar por nombre, descripcion o tipo"
         />
 
         <select
           value={typeFilter}
           onChange={(event) => onTypeFilterChange(event.target.value)}
-          className="rounded-md border border-white/15 bg-black/20 px-3 py-2 text-sm outline-none focus:border-cyan-300/60"
+          className="w-full rounded-md border border-white/15 bg-black/20 px-3 py-2 text-sm outline-none focus:border-cyan-300/60 sm:w-auto"
         >
           <option value="ALL">Todos los tipos</option>
           {ITEM_TYPES.map((type) => (

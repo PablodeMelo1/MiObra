@@ -65,18 +65,18 @@ function PendingList({ pendings, onToggleDone, onEdit, onDelete }) {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex w-full items-center gap-2 sm:w-auto">
                 <button
                   type="button"
                   onClick={() => onEdit(pending)}
-                  className="rounded border border-white/20 px-2 py-1 text-xs text-white/80 hover:bg-white/10"
+                  className="flex-1 rounded border border-white/20 px-2 py-1 text-xs text-white/80 hover:bg-white/10 sm:flex-none"
                 >
                   Editar
                 </button>
                 <button
                   type="button"
                   onClick={() => onDelete(pending)}
-                  className="rounded border border-rose-300/35 px-2 py-1 text-xs text-rose-100/90 hover:bg-rose-500/20"
+                  className="flex-1 rounded border border-rose-300/35 px-2 py-1 text-xs text-rose-100/90 hover:bg-rose-500/20 sm:flex-none"
                 >
                   Eliminar
                 </button>

@@ -4,8 +4,8 @@ function SupplierTable({ suppliers, onEdit, onDelete }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-white/10 bg-[#10141d]">
-      <table className="min-w-full text-sm">
+    <div className="overflow-x-auto rounded-xl border border-white/10 bg-[#10141d]">
+      <table className="min-w-[720px] text-sm">
         <thead className="bg-white/5 text-xs uppercase tracking-wide text-white/60">
           <tr>
             <th className="px-3 py-2 text-left">Nombre</th>

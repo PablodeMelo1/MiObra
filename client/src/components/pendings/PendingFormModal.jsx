@@ -20,7 +20,7 @@ function PendingFormModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/65 p-3">
+    <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/65 p-3 sm:p-4">
       <div className="w-full max-w-lg rounded-xl border border-cyan-300/20 bg-[#0f1724] p-4 text-white shadow-2xl">
         <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
           <h3 className="text-sm font-semibold">{mode === 'create' ? 'Crear pendiente' : 'Editar pendiente'}</h3>

@@ -89,10 +89,10 @@ function Profile() {
 
   return (
     <div className="min-h-screen bg-[#0c0f14] text-white">
-      <div className="flex min-h-screen items-start gap-4 px-6 py-5">
+      <div className="flex min-h-screen flex-col items-stretch gap-4 px-3 py-3 sm:px-5 lg:flex-row lg:items-start lg:px-6 lg:py-5">
         <Sidebar />
 
-        <section className="flex-1 p-3">
+        <section className="min-w-0 flex-1 p-0 sm:p-3">
           <div className="mb-3">
             <h1 className="text-lg font-semibold">Perfil</h1>
             <p className="text-xs text-white/60">Visualiza y edita tus datos de usuario</p>

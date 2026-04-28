@@ -2,7 +2,7 @@ function CreateProjectModal({ isOpen, form, error, onClose, onChange, onSubmit }
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/65 p-3">
+    <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/65 p-3 sm:p-4">
       <div className="w-full max-w-lg rounded-xl border border-white/15 bg-[#111722] p-4 text-white shadow-2xl">
         <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
           <h3 className="text-sm font-semibold">Crear proyecto</h3>
@@ -16,8 +16,8 @@ function CreateProjectModal({ isOpen, form, error, onClose, onChange, onSubmit }
         </div>
 
         <form className="space-y-2 text-xs" onSubmit={onSubmit}>
-          <div className="grid grid-cols-2 gap-2">
-            <label className="col-span-2 space-y-1">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <label className="sm:col-span-2 space-y-1">
               <span className="text-white/70">Nombre</span>
               <input
                 value={form.name}
@@ -27,7 +27,7 @@ function CreateProjectModal({ isOpen, form, error, onClose, onChange, onSubmit }
               />
             </label>
 
-            <label className="col-span-2 space-y-1">
+            <label className="sm:col-span-2 space-y-1">
               <span className="text-white/70">Descripcion</span>
               <textarea
                 value={form.description}
@@ -37,7 +37,7 @@ function CreateProjectModal({ isOpen, form, error, onClose, onChange, onSubmit }
               />
             </label>
 
-            <label className="col-span-2 space-y-1">
+            <label className="sm:col-span-2 space-y-1">
               <span className="text-white/70">Ubicacion</span>
               <input
                 value={form.location}
@@ -66,7 +66,7 @@ function CreateProjectModal({ isOpen, form, error, onClose, onChange, onSubmit }
               />
             </label>
 
-            <label className="col-span-2 space-y-1">
+            <label className="sm:col-span-2 space-y-1">
               <span className="text-white/70">Columnas (separadas por coma)</span>
               <input
                 value={form.listsText}

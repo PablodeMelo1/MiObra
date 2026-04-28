@@ -14,7 +14,7 @@ function ItemActivitiesTable({
     <div className="rounded-2xl border border-white/10 bg-[#111723] p-4">
       <h2 className="mb-3 text-base font-semibold">Historial del item</h2>
       <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse text-sm">
+        <table className="min-w-[900px] border-collapse text-sm">
           <thead>
             <tr className="border-b border-white/10 text-left text-white/60">
               <th className="px-2 py-2">Usuario</th>
