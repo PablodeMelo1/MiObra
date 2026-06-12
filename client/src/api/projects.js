@@ -1,10 +1,4 @@
-import axios from "axios";
-import { API_URL } from "./http";
-
-const api = axios.create({
-    baseURL: API_URL,
-    withCredentials: true,
-});
+import api from "./http";
 
 export const getProjects = () => api.get('/api/v1/projects');
 export const getProjectsCatalog = () => api.get('/api/v1/projects/catalog');

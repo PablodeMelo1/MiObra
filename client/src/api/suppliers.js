@@ -1,10 +1,4 @@
-import axios from 'axios';
-import { API_URL } from './http';
-
-const api = axios.create({
-  baseURL: API_URL,
-  withCredentials: true,
-});
+import api from './http';
 
 export const getSuppliers = () => api.get('/api/v1/suppliers');
 export const getSupplierById = (id) => api.get(`/api/v1/suppliers/${id}`);

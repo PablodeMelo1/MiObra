@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import cors from 'cors';
 dotenv.config();
-import './config/mongo-config.mjs';
+import { connectMongo } from './config/mongo-config.mjs';
 
 import express from 'express';
 import cookieParser from 'cookie-parser';
@@ -31,6 +31,15 @@ app.use(cookieParser());
 
 app.get('/', (req, res) => {
 	res.json({ status: 'ok', environment: process.env.NODE_ENV || 'development' });
+});
+
+app.use('/api/v1', async (req, res, next) => {
+	try {
+		await connectMongo();
+		next();
+	} catch (error) {
+		next(error);
+	}
 });
 
 app.use('/api/v1/auth', publicRoutes);

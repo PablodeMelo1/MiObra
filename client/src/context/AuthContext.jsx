@@ -42,20 +42,19 @@ export const AuthProvider = ({children}) => {
 
     const signIn = async (user) => {
         setIsLoading(true);
-        const response = await loginRequest(user);
-
         try {
+            const response = await loginRequest(user);
             const sessionResponse = await verifySessionRequest();
             setUser(sessionResponse.data?.user ?? sessionResponse.data);
             setIsAuthenticated(true);
-        } catch {
+            return response;
+        } catch (error) {
             setUser(null);
             setIsAuthenticated(false);
+            throw error;
         } finally {
             setIsLoading(false);
         }
-
-        return response;
     };
 
     const signOut = async () => {

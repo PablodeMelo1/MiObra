@@ -10,7 +10,8 @@ export const validateAuth = Joi.object({
     email: Joi.string().regex(/.+@.+\..+/).required(),
     tipoUsuario: Joi.string().valid("user", "admin"),
     role: Joi.string().valid("user", "admin"),
-    iat: Joi.number().integer()
+    iat: Joi.number().integer(),
+    exp: Joi.number().integer()
 });
 
 export const validateSingup = Joi.object({

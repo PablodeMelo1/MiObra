@@ -98,19 +98,30 @@ const buildMongoUri = () => {
 
 const mongoUri = buildMongoUri();
 const mongoInfo = getMongoInfo(mongoUri);
+let connectionPromise = null;
 
 export const connectMongo = async () => {
+	if (mongoose.connection.readyState === 1) {
+		return mongoose.connection;
+	}
+
+	if (connectionPromise) {
+		return connectionPromise;
+	}
+
+	connectionPromise = mongoose.connect(mongoUri, {
+		serverSelectionTimeoutMS: 5000,
+	});
+
 	try {
 		console.log(`Conectando Mongo (${mongoInfo.protocol}) host=${mongoInfo.host} db=${mongoInfo.database}`);
-		await mongoose.connect(mongoUri, {
-			serverSelectionTimeoutMS: 5000,
-		});
+		await connectionPromise;
 		console.log(`Mongo conectado (${mongoInfo.host})`);
+		return mongoose.connection;
 	} catch (err) {
+		connectionPromise = null;
 		console.error('Hubo un error en la conexion de mongo:', err.message);
 		console.error(`Mongo intentado: host=${mongoInfo.host} db=${mongoInfo.database}`);
-		process.exit(1);
+		throw err;
 	}
 };
-
-connectMongo();
