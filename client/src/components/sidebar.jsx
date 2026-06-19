@@ -3,7 +3,9 @@ import { useAuth } from '../context/auth-context';
 
 
 const mainItems = [
+    { id: 'dashboard', label: 'Panel operativo', path: '/dashboard', icon: 'fa-solid fa-chart-line' },
     { id: 'projects', label: 'Proyectos', path: '/projects', icon: 'fa-solid fa-list-check' },
+    { id: 'calendar', label: 'Calendario', path: '/calendar', icon: 'fa-regular fa-calendar-days' },
     { id: 'pendings', label: 'Pendientes', path: '/pendings', icon: 'fa-regular fa-clock' },
     { id: 'inventory', label: 'Inventario', path: '/inventory', icon: 'fa-solid fa-screwdriver-wrench' },
     { id: 'inventory-history', label: 'Historial inventario', path: '/inventory/history', icon: 'fa-solid fa-timeline' },
@@ -12,7 +14,7 @@ const mainItems = [
 ]
 
 const settingsItems = [
-    { id: 'settings', label: 'Settings', path: '/settings', icon: 'fa-solid fa-gears' },
+    { id: 'settings', label: 'Configuracion', path: '/settings', icon: 'fa-solid fa-gears' },
 ]
 
 const Icon = ({ name, active }) => {
@@ -71,7 +73,7 @@ function Sidebar() {
             </div>
 
             <div className="mt-4 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/40 lg:mt-7">
-                Settings
+                Sistema
             </div>
             <div className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-2 lg:overflow-visible lg:pb-0">
                 {settingsItems.map((item) => (

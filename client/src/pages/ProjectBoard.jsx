@@ -18,8 +18,13 @@ import BoardColumn from '../components/projectBoard/BoardColumn';
 import ProjectSettingsModal from '../components/projectBoard/ProjectSettingsModal';
 import RenameColumnModal from '../components/projectBoard/RenameColumnModal';
 import TaskModal from '../components/projectBoard/TaskModal';
+import ProjectInfoDrawer from '../components/projectBoard/ProjectInfoDrawer';
 import { groupTasksByList, toInputDate } from '../components/projectBoard/boardUtils';
 import { DEFAULT_PROJECT_MEMBER_ROLE } from '../constants/projectBoard';
+import { getMaterialRequests } from '../api/materialRequests';
+import { getItems } from '../api/items';
+import { createComment, getCommentsByEntity } from '../api/comments';
+import { getProjectRequests } from '../services/operationsData';
 
 function ProjectBoard() {
   const { id: projectId } = useParams();
@@ -30,6 +35,13 @@ function ProjectBoard() {
   const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState([]);
   const [projectMembers, setProjectMembers] = useState([]);
+  const [materialRequests, setMaterialRequests] = useState([]);
+  const [items, setItems] = useState([]);
+  const [journalComments, setJournalComments] = useState([]);
+  const [journalError, setJournalError] = useState('');
+  const [journalLoading, setJournalLoading] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [detailsTab, setDetailsTab] = useState('summary');
 
   const [loadingData, setLoadingData] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
@@ -129,17 +141,31 @@ function ProjectBoard() {
         setLoadingData(true);
         setErrorMessage('');
 
-        const [projectResponse, tasksResponse, usersResponse, membersResponse] = await Promise.all([
+        const [
+          projectResponse,
+          tasksResponse,
+          usersResponse,
+          membersResponse,
+          requestsResponse,
+          itemsResponse,
+          commentsResponse,
+        ] = await Promise.all([
           getProjectById(projectId),
           getTasksByProjectId(projectId),
           getUsers(),
           getProjectMembers(projectId),
+          getMaterialRequests(),
+          getItems(),
+          getCommentsByEntity('PROJECT', projectId),
         ]);
 
         setProject(projectResponse.data?.project || null);
         setTasks(tasksResponse.data?.tareas || []);
         setUsers(usersResponse.data || []);
         setProjectMembers(membersResponse.data?.members || []);
+        setMaterialRequests(requestsResponse.data?.materialRequests || []);
+        setItems(itemsResponse.data || []);
+        setJournalComments(commentsResponse.data?.comments || []);
       } catch (error) {
         console.error('Error loading project board:', error);
         setErrorMessage('No se pudo cargar el tablero del proyecto');
@@ -443,6 +469,31 @@ function ProjectBoard() {
     }
   };
 
+  const projectMaterialRequests = useMemo(
+    () => getProjectRequests(materialRequests, projectId),
+    [materialRequests, projectId],
+  );
+
+  const handleCreateJournalComment = async (comment) => {
+    try {
+      setJournalLoading(true);
+      setJournalError('');
+      const response = await createComment('PROJECT', projectId, { comment });
+      const created = response.data?.comment || response.data;
+      setJournalComments((prev) => [...prev, created]);
+    } catch (error) {
+      console.error('Error creating project journal comment:', error);
+      setJournalError('No se pudo guardar el registro de bitacora.');
+    } finally {
+      setJournalLoading(false);
+    }
+  };
+
+  const openDetailsTab = (tab) => {
+    setDetailsTab(tab);
+    setDetailsOpen(true);
+  };
+
   const openCreateTaskModal = (listName) => {
     clearBoardMessage();
     setTaskForm({
@@ -561,8 +612,25 @@ function ProjectBoard() {
               boardMessage={boardMessage}
               newListName={newListName}
               onOpenProjectSettings={openProjectSettings}
+              onOpenSummary={() => openDetailsTab('summary')}
+              onOpenJournal={() => openDetailsTab('journal')}
               onNewListNameChange={handleNewListNameChange}
               onAddList={handleAddList}
+            />
+
+            <ProjectInfoDrawer
+              isOpen={detailsOpen}
+              activeTab={detailsTab}
+              project={project}
+              tasks={tasks}
+              materialRequests={projectMaterialRequests}
+              items={items}
+              journalComments={journalComments}
+              journalLoading={journalLoading}
+              journalError={journalError}
+              onTabChange={setDetailsTab}
+              onClose={() => setDetailsOpen(false)}
+              onCreateJournalComment={handleCreateJournalComment}
             />
 
             <div className="flex min-h-[70vh] items-start gap-2 overflow-x-auto overflow-y-visible pb-1">

@@ -3,7 +3,7 @@ function SupplierHeader({ searchValue, onSearchChange, onOpenCreate }) {
     <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
       <div>
         <h1 className="text-lg font-semibold">Proveedores</h1>
-        <p className="text-xs text-white/60">Gestion completa de proveedores</p>
+        <p className="text-xs text-white/60">Contactos, compras abiertas e historial operativo.</p>
       </div>
 
       <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
@@ -16,8 +16,9 @@ function SupplierHeader({ searchValue, onSearchChange, onOpenCreate }) {
         <button
           type="button"
           onClick={onOpenCreate}
-          className="rounded border border-white/20 bg-[#1b2331] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#253247]"
+          className="inline-flex items-center justify-center gap-2 rounded border border-white/20 bg-[#1b2331] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#253247]"
         >
+          <i className="fa-solid fa-plus" aria-hidden="true" />
           Nuevo proveedor
         </button>
       </div>

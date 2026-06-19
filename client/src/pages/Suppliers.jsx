@@ -14,6 +14,7 @@ import {
   searchSuppliersByName,
   updateSupplier,
 } from '../api/suppliers';
+import { getMaterialRequests } from '../api/materialRequests';
 
 const emptySupplierForm = {
   name: '',
@@ -27,6 +28,7 @@ function Suppliers() {
   const { isAuthenticated, isLoading } = useAuth();
 
   const [suppliers, setSuppliers] = useState([]);
+  const [materialRequests, setMaterialRequests] = useState([]);
   const [loadingSuppliers, setLoadingSuppliers] = useState(true);
   const [searchValue, setSearchValue] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -54,11 +56,15 @@ function Suppliers() {
       setLoadingSuppliers(true);
       setErrorMessage('');
 
-      const response = searchTerm.trim()
-        ? await searchSuppliersByName(searchTerm.trim())
-        : await getSuppliers();
+      const [response, requestsResponse] = await Promise.all([
+        searchTerm.trim()
+          ? searchSuppliersByName(searchTerm.trim())
+          : getSuppliers(),
+        getMaterialRequests(),
+      ]);
 
       setSuppliers(response.data?.suppliers || []);
+      setMaterialRequests(requestsResponse.data?.materialRequests || []);
     } catch (error) {
       console.error('Error loading suppliers:', error);
       setSuppliers([]);
@@ -176,6 +182,15 @@ function Suppliers() {
     }
   };
 
+  const getSupplierStats = (supplier) => {
+    const supplierId = String(supplier._id || supplier.id);
+    const requests = materialRequests.filter((request) => String(request.supplierId?._id || request.supplierId || '') === supplierId);
+    return {
+      total: requests.length,
+      open: requests.filter((request) => request.status !== 'RECIBIDO').length,
+    };
+  };
+
   if (isLoading || loadingSuppliers) return <LoadingScreen message="Cargando proveedores..." />;
 
   return (
@@ -192,7 +207,12 @@ function Suppliers() {
 
           {errorMessage ? <p className="mb-2 text-xs text-rose-200">{errorMessage}</p> : null}
 
-          <SupplierTable suppliers={suppliers} onEdit={openEditModal} onDelete={openDeleteModal} />
+          <SupplierTable
+            suppliers={suppliers}
+            getStats={getSupplierStats}
+            onEdit={openEditModal}
+            onDelete={openDeleteModal}
+          />
         </section>
       </div>
 

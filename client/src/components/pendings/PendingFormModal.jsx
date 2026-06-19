@@ -89,7 +89,7 @@ function PendingFormModal({
             </label>
 
             <label className="space-y-1">
-              <span className="text-white/70">Assigned to</span>
+              <span className="text-white/70">Responsable</span>
               <select
                 value={form.assignedTo}
                 onChange={(event) => onChange('assignedTo', event.target.value)}

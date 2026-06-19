@@ -1,4 +1,5 @@
 export const ENTITY_TYPES = Object.freeze({
+    PROJECT: 'PROJECT',
     TASK: 'TASK',
     PENDING: 'PENDING',
     MATERIALREQUEST: 'MATERIALREQUEST',

@@ -11,6 +11,7 @@ import Pendings from './pages/Pendings';
 import Inventory from './pages/Inventory';
 import InventoryItemDetails from './pages/InventoryItemDetails';
 import InventoryHistory from './pages/InventoryHistory';
+import Calendar from './pages/Calendar';
 import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/routing/ProtectedRoute';
@@ -30,6 +31,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/calendar" element={<Calendar />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/projects/:id" element={<ProjectBoard />} />
             <Route path="/suppliers" element={<Suppliers />} />

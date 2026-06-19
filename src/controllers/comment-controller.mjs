@@ -45,7 +45,7 @@ export const deleteComment = async (req, res) => {
     try {
         const commentRepository = new commentMongoRepository();
         const { id } = req.params;
-        const { id: userId, role } = req.user || {};
+        const { id: userId, role, tipoUsuario } = req.user || {};
         if (!userId) {
             return res.status(401).json({ message: "Usuario no autenticado" });
         }
@@ -54,7 +54,7 @@ export const deleteComment = async (req, res) => {
         if (!comment) {
             return res.status(404).json({ message: "Comentario no encontrado" });
         }
-        if (comment.userId.toString() !== userId.toString() && role !== 'admin') {
+        if (comment.userId.toString() !== userId.toString() && (role || tipoUsuario) !== 'admin') {
             return res.status(403).json({ message: "No tiene permiso para eliminar este comentario" });
         }
         const deleted = await commentRepository.deleteById({ _id: id });
@@ -72,7 +72,7 @@ export const updateComment = async (req, res) => {
         const commentRepository = new commentMongoRepository();
         const { id } = req.params;
         const { comment: newComment } = req.body;
-        const { id: userId, role } = req.user || {};
+        const { id: userId, role, tipoUsuario } = req.user || {};
         if (!userId) {
             return res.status(401).json({ message: "Usuario no autenticado" });
         }
@@ -80,7 +80,7 @@ export const updateComment = async (req, res) => {
         if (!comment) {
             return res.status(404).json({ message: "Comentario no encontrado" });
         }
-        if (comment.userId.toString() !== userId.toString() && role !== 'admin') {
+        if (comment.userId.toString() !== userId.toString() && (role || tipoUsuario) !== 'admin') {
             return res.status(403).json({ message: "No tiene permiso para actualizar este comentario" });
         }
         const updated = await commentRepository.updateById({ _id: id }, { comment: newComment });

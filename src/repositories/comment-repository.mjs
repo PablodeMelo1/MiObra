@@ -4,7 +4,8 @@ export default class commentMongoRepository {
     async createOne(data) {
         try {
             const newComment = new Comment(data);
-            return await newComment.save();
+            await newComment.save();
+            return newComment.populate('userId', 'name email');
         } catch (error) {
             throw new Error('error creating a comment');
         }
@@ -15,7 +16,11 @@ export default class commentMongoRepository {
     }
 
     async getByEntity({ entityType, entityId }) {
-        return Comment.find({ entityType, entityId }).sort({ createdAt: 1 });
+        return Comment.find({ entityType, entityId }).populate('userId', 'name email').sort({ createdAt: 1 });
+    }
+
+    async updateById(data, update) {
+        return Comment.findByIdAndUpdate(data._id, update, { new: true }).populate('userId', 'name email');
     }
 
     async deleteById(data) {
