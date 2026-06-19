@@ -1,4 +1,5 @@
 import { MATERIAL_REQUEST_STATUS_OPTIONS } from '../../constants/materialRequest';
+import DateField from '../forms/DateField';
 
 function MaterialRequestFormModal({
   isOpen,
@@ -6,7 +7,6 @@ function MaterialRequestFormModal({
   form,
   suppliers,
   projects,
-  requesterName,
   error,
   onClose,
   onChange,
@@ -55,15 +55,6 @@ function MaterialRequestFormModal({
             </label>
 
             <label className="sm:col-span-2 space-y-1">
-              <span className="text-white/70">Solicitado por</span>
-              <input
-                value={requesterName || 'Usuario'}
-                readOnly
-                className="w-full rounded border border-white/10 bg-[#090d14] px-2 py-1.5 text-white/60"
-              />
-            </label>
-
-            <label className="sm:col-span-2 space-y-1">
               <span className="text-white/70">Descripcion</span>
               <textarea
                 value={form.description}
@@ -73,15 +64,11 @@ function MaterialRequestFormModal({
               />
             </label>
 
-            <label className="space-y-1">
-              <span className="text-white/70">Fecha pedido</span>
-              <input
-                type="date"
-                value={form.orderDate}
-                onChange={(event) => onChange('orderDate', event.target.value)}
-                className="w-full rounded border border-white/15 bg-[#0d1119] px-2 py-1.5 text-white outline-none focus:border-white/30"
-              />
-            </label>
+            <DateField
+              label="Fecha pedido"
+              value={form.orderDate}
+              onChange={(value) => onChange('orderDate', value)}
+            />
 
             {isEditMode ? (
               <>
@@ -116,15 +103,11 @@ function MaterialRequestFormModal({
                   </select>
                 </label>
 
-                <label className="space-y-1">
-                  <span className="text-white/70">Llega dia</span>
-                  <input
-                    type="date"
-                    value={form.arrivalDate}
-                    onChange={(event) => onChange('arrivalDate', event.target.value)}
-                    className="w-full rounded border border-white/15 bg-[#0d1119] px-2 py-1.5 text-white outline-none focus:border-white/30"
-                  />
-                </label>
+                <DateField
+                  label="Llega dia"
+                  value={form.arrivalDate}
+                  onChange={(value) => onChange('arrivalDate', value)}
+                />
               </>
             ) : null}
 

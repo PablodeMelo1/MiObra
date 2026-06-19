@@ -1,9 +1,9 @@
 {
   "info": {
-    "_postman_id": "miobra-api-collection",
-    "name": "MiObra API - Collection",
+    "_postman_id": "scandia-api-collection",
+    "name": "Scandia API - Collection",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Colección para probar los endpoints de MiObra (auto-generada). Use la variable {{base_url}} para apuntar al servidor (por defecto http://localhost:3000)."
+    "description": "Colección para probar los endpoints de Scandia (auto-generada). Use la variable {{base_url}} para apuntar al servidor (por defecto http://localhost:3000)."
   },
   "item": [
     {

@@ -1,3 +1,5 @@
+import DateField from '../forms/DateField';
+
 function CreateProjectModal({ isOpen, form, error, onClose, onChange, onSubmit }) {
   if (!isOpen) return null;
 
@@ -46,25 +48,17 @@ function CreateProjectModal({ isOpen, form, error, onClose, onChange, onSubmit }
               />
             </label>
 
-            <label className="space-y-1">
-              <span className="text-white/70">Fecha inicio</span>
-              <input
-                type="date"
-                value={form.startDate}
-                onChange={(event) => onChange('startDate', event.target.value)}
-                className="w-full rounded border border-white/15 bg-[#0d1119] px-2 py-1.5 text-white outline-none focus:border-white/30"
-              />
-            </label>
+            <DateField
+              label="Fecha inicio"
+              value={form.startDate}
+              onChange={(value) => onChange('startDate', value)}
+            />
 
-            <label className="space-y-1">
-              <span className="text-white/70">Fecha fin</span>
-              <input
-                type="date"
-                value={form.endDate}
-                onChange={(event) => onChange('endDate', event.target.value)}
-                className="w-full rounded border border-white/15 bg-[#0d1119] px-2 py-1.5 text-white outline-none focus:border-white/30"
-              />
-            </label>
+            <DateField
+              label="Fecha fin"
+              value={form.endDate}
+              onChange={(value) => onChange('endDate', value)}
+            />
 
             <label className="sm:col-span-2 space-y-1">
               <span className="text-white/70">Columnas (separadas por coma)</span>

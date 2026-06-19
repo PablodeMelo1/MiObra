@@ -1,4 +1,5 @@
 import { PROJECT_ROLE_OPTIONS } from '../../constants/projectBoard';
+import DateField from '../forms/DateField';
 
 function ProjectSettingsModal({
   isOpen,
@@ -59,25 +60,17 @@ function ProjectSettingsModal({
               />
             </label>
 
-            <label className="space-y-1">
-              <span className="text-white/70">Fecha inicio</span>
-              <input
-                type="date"
-                value={form.startDate}
-                onChange={(event) => onChange('startDate', event.target.value)}
-                className="w-full rounded border border-white/15 bg-[#0d1119] px-2 py-1.5 text-white outline-none focus:border-white/30"
-              />
-            </label>
+            <DateField
+              label="Fecha inicio"
+              value={form.startDate}
+              onChange={(value) => onChange('startDate', value)}
+            />
 
-            <label className="space-y-1">
-              <span className="text-white/70">Fecha fin</span>
-              <input
-                type="date"
-                value={form.endDate}
-                onChange={(event) => onChange('endDate', event.target.value)}
-                className="w-full rounded border border-white/15 bg-[#0d1119] px-2 py-1.5 text-white outline-none focus:border-white/30"
-              />
-            </label>
+            <DateField
+              label="Fecha fin"
+              value={form.endDate}
+              onChange={(value) => onChange('endDate', value)}
+            />
           </div>
 
           <div className="border-t border-white/10 pt-3">
@@ -93,7 +86,7 @@ function ProjectSettingsModal({
                     className="flex items-center justify-between rounded border border-white/10 px-2 py-1"
                   >
                     <span className="truncate text-[11px] text-white/80">
-                      {member.name || member.email || member.userId}
+                      {member.name || member.email || 'Usuario sin nombre'}
                     </span>
                     <span className="text-[10px] text-white/55">{member.role}</span>
                   </div>
@@ -112,7 +105,7 @@ function ProjectSettingsModal({
                   <option value="">Seleccionar usuario</option>
                   {availableUsers.map((user) => (
                     <option key={user._id || user.id} value={user._id || user.id}>
-                      {user.name || user.email || user._id || user.id}
+                      {user.name || user.email || 'Usuario sin nombre'}
                     </option>
                   ))}
                 </select>

@@ -1,7 +1,7 @@
 {
-  "name": "miobra",
+  "name": "scandia",
   "version": "1.0.0",
-  "description": "Sistema de gesiton de obras",
+  "description": "Sistema de gestion de obras",
   "type": "module",
   "main": "src/app.mjs",
   "engines": {
@@ -19,15 +19,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PablodeMelo1/MiObra.git"
+    "url": "git+https://github.com/PablodeMelo1/Scandia.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/PablodeMelo1/MiObra/issues"
+    "url": "https://github.com/PablodeMelo1/Scandia/issues"
   },
-  "homepage": "https://github.com/PablodeMelo1/MiObra#readme",
+  "homepage": "https://github.com/PablodeMelo1/Scandia#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",

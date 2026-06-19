@@ -63,7 +63,6 @@ function ProjectBoard() {
     list: '',
   });
   const [taskForm, setTaskForm] = useState({
-    projectId,
     title: '',
     description: '',
     assignedTo: '',
@@ -71,7 +70,6 @@ function ProjectBoard() {
     priority: 'MEDIUM',
     list: '',
     dueDate: '',
-    createdAt: '',
   });
 
   const lists = useMemo(() => {
@@ -448,7 +446,6 @@ function ProjectBoard() {
   const openCreateTaskModal = (listName) => {
     clearBoardMessage();
     setTaskForm({
-      projectId,
       title: '',
       description: '',
       assignedTo: '',
@@ -456,7 +453,6 @@ function ProjectBoard() {
       priority: 'MEDIUM',
       list: listName,
       dueDate: '',
-      createdAt: '',
     });
     setTaskModal({ isOpen: true, mode: 'create', taskId: '', list: listName });
   };
@@ -464,7 +460,6 @@ function ProjectBoard() {
   const openEditTaskModal = (task) => {
     clearBoardMessage();
     setTaskForm({
-      projectId,
       title: task.title || '',
       description: task.description || '',
       assignedTo: task.assignedTo?._id || task.assignedTo || '',
@@ -472,7 +467,6 @@ function ProjectBoard() {
       priority: task.priority || 'MEDIUM',
       list: task.list || lists[0] || 'Tareas pendientes',
       dueDate: toInputDate(task.dueDate),
-      createdAt: toInputDate(task.createdAt),
     });
     setTaskModal({ isOpen: true, mode: 'edit', taskId: task._id || task.id, list: task.list });
   };
@@ -605,7 +599,6 @@ function ProjectBoard() {
         onChange={handleTaskFormChange}
         onSubmit={handleTaskSubmit}
         referenceTask={selectedTask}
-        userLabelById={userNameById}
       />
 
       <ProjectSettingsModal

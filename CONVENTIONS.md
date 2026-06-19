@@ -1,6 +1,6 @@
 # Convenciones del proyecto
 
-Estas reglas buscan mantener MiObra simple, escalable y facil de modificar sin cambiar comportamiento existente por accidente.
+Estas reglas buscan mantener Scandia simple, escalable y facil de modificar sin cambiar comportamiento existente por accidente.
 
 ## Principios generales
 

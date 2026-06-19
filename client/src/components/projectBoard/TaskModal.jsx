@@ -1,4 +1,5 @@
 import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS, getTaskStatusLabel } from './boardUtils';
+import DateField from '../forms/DateField';
 
 function TaskModal({
   isOpen,
@@ -10,7 +11,6 @@ function TaskModal({
   onChange,
   onSubmit,
   referenceTask,
-  userLabelById,
 }) {
   if (!isOpen) return null;
 
@@ -102,7 +102,7 @@ function TaskModal({
                   <option value="">Sin asignar</option>
                   {users.map((user) => (
                     <option key={user._id || user.id} value={user._id || user.id}>
-                      {user.name || user.email || user._id || user.id}
+                      {user.name || user.email || 'Usuario sin nombre'}
                     </option>
                   ))}
                 </select>
@@ -138,50 +138,12 @@ function TaskModal({
                 </select>
               </label>
 
-              <label className="sm:col-span-2 space-y-1">
-                <span className="text-white/70">Fecha limite</span>
-                <input
-                  type="date"
-                  value={form.dueDate}
-                  onChange={(event) => onChange('dueDate', event.target.value)}
-                  className="w-full rounded border border-white/15 bg-[#0d1119] px-2 py-1.5 text-white outline-none focus:border-white/30"
-                />
-              </label>
-
-              {mode !== 'create' ? (
-                <>
-                  <label className="space-y-1">
-                    <span className="text-white/50">ProjectId</span>
-                    <input
-                      value={form.projectId}
-                      readOnly
-                      className="w-full rounded border border-white/10 bg-[#090d14] px-2 py-1.5 text-white/50"
-                    />
-                  </label>
-
-                  <label className="space-y-1">
-                    <span className="text-white/50">CreatedAt</span>
-                    <input
-                      value={form.createdAt || 'Se asigna automaticamente'}
-                      readOnly
-                      className="w-full rounded border border-white/10 bg-[#090d14] px-2 py-1.5 text-white/50"
-                    />
-                  </label>
-                </>
-              ) : null}
-
-              {referenceTask ? (
-                <label className="sm:col-span-2 space-y-1">
-                  <span className="text-white/50">Asignado actual</span>
-                  <input
-                    value={
-                      referenceTask.assignedTo ? userLabelById(referenceTask.assignedTo) : 'Sin asignar'
-                    }
-                    readOnly
-                    className="w-full rounded border border-white/10 bg-[#090d14] px-2 py-1.5 text-white/50"
-                  />
-                </label>
-              ) : null}
+              <DateField
+                label="Fecha limite"
+                value={form.dueDate}
+                onChange={(value) => onChange('dueDate', value)}
+                className="sm:col-span-2"
+              />
             </div>
 
             <div className="flex justify-end gap-2 pt-1">

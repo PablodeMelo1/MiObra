@@ -34,7 +34,7 @@ function Sidebar() {
     return (
         <aside className="relative w-full shrink-0 rounded-xl border border-white/5 bg-linear-to-b from-[#1d222d] via-[#151922] to-[#0f131b] px-3 pb-3 pt-4 text-white shadow-[0_20px_60px_rgba(0,0,0,0.45)] transition-all duration-300 lg:w-75 lg:rounded-2xl lg:px-4 lg:pb-5 lg:pt-6">
             <div className="mb-3 gap-3 border-b border-white/10 pb-3 text-center lg:mb-5">
-                <h1 className="text-2xl font-semibold tracking-wide text-white">Miobra</h1>
+                <h1 className="text-2xl font-semibold tracking-wide text-white">Scandia</h1>
             </div>
 
             <div className="flex min-w-0 items-center gap-3 border-b border-white/10 pb-4 lg:pb-5">

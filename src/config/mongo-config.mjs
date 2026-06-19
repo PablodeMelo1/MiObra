@@ -5,7 +5,7 @@ const {
 	MONGO_BD_IN_USE,
 	MONGO_URL = 'localhost',
 	MONGO_PORT = '27017',
-	MONGO_DB = 'miobra_db',
+	MONGO_DB = 'scandia_db',
 	MONGO_ATLAS_URI,
 	MONGO_ATLAS,
 	MONGO_ATLAS_USER,

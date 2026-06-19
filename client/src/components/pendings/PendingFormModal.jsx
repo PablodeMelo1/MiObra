@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import CollaboratorsSelector from './CollaboratorsSelector';
+import DateField from '../forms/DateField';
 
 function PendingFormModal({
   isOpen,
@@ -55,15 +56,11 @@ function PendingFormModal({
           </label>
 
           <div className="grid gap-2 sm:grid-cols-2">
-            <label className="space-y-1">
-              <span className="text-white/70">Fecha limite</span>
-              <input
-                type="date"
-                value={form.dueDate}
-                onChange={(event) => onChange('dueDate', event.target.value)}
-                className="w-full rounded border border-white/15 bg-[#0b1019] px-2 py-1.5 text-white outline-none focus:border-cyan-300/40"
-              />
-            </label>
+            <DateField
+              label="Fecha limite"
+              value={form.dueDate}
+              onChange={(value) => onChange('dueDate', value)}
+            />
 
             <label className="mt-5 inline-flex items-center gap-2 rounded border border-white/15 bg-white/5 px-2 py-1.5 text-white/80">
               <input
@@ -102,7 +99,7 @@ function PendingFormModal({
                   const id = String(user._id || user.id);
                   return (
                     <option key={id} value={id}>
-                      {user.name || user.email || id}
+                      {user.name || user.email || 'Usuario sin nombre'}
                     </option>
                   );
                 })}

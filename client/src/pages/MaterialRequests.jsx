@@ -31,7 +31,7 @@ function toInputDate(value) {
 
 function MaterialRequests() {
   const navigate = useNavigate();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   const [requests, setRequests] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
@@ -44,11 +44,6 @@ function MaterialRequests() {
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: '', materialName: '' });
   const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState('');
-
-  const selectedRequest = useMemo(
-    () => requests.find((item) => (item._id || item.id) === formModal.id) || null,
-    [formModal.id, requests],
-  );
 
   const filteredRequests = useMemo(() => {
     if (statusFilter === 'ALL') return requests;
@@ -228,16 +223,10 @@ function MaterialRequests() {
         form={form}
         suppliers={suppliers}
         projects={projects}
-        requesterName={
-          formModal.mode === 'edit'
-            ? selectedRequest?.createdBy?.name || selectedRequest?.createdBy?.email || user?.name || ''
-            : user?.name || user?.email || ''
-        }
         error={formError}
         onClose={closeFormModal}
         onChange={handleChange}
         onSubmit={handleSubmit}
-        selectedRequest={selectedRequest}
       />
 
       <DeleteMaterialRequestModal

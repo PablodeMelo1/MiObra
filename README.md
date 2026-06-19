@@ -1,4 +1,4 @@
-# MiObra
+# Scandia
 Sistema de gestion de obras.
 
 ## Desarrollo
@@ -37,7 +37,7 @@ Pasos:
 
 1. Subir el repo a GitHub.
 2. Entrar a Vercel y elegir `Add New... > Project`.
-3. Importar el repositorio `MiObra`.
+3. Importar el repositorio `Scandia`.
 4. Dejar el framework como `Other`.
 5. Agregar las variables de entorno anteriores en `Settings > Environment Variables`.
 6. Hacer deploy.
@@ -70,6 +70,6 @@ Opcion por partes:
 MONGO_ATLAS=<cluster-host>
 MONGO_ATLAS_USER=<user>
 MONGO_ATLAS_PASS=<password>
-MONGO_ATLAS_DB=miobra_db
-MONGO_ATLAS_APP_NAME=MiObra
+MONGO_ATLAS_DB=scandia_db
+MONGO_ATLAS_APP_NAME=Scandia
 ```

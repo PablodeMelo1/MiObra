@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 
 function CollaboratorsSelector({ users, collaborators, assignedTo, currentUserId, onChange }) {
   const [collaboratorToAdd, setCollaboratorToAdd] = useState('');
+  const getUserLabel = (user, id) => `${user.name || user.email || 'Usuario sin nombre'}${id === currentUserId ? ' (vos)' : ''}`;
 
   const collaboratorUsers = useMemo(
     () => users.filter((user) => collaborators.includes(String(user._id || user.id))),
@@ -46,7 +47,7 @@ function CollaboratorsSelector({ users, collaborators, assignedTo, currentUserId
             const id = String(user._id || user.id);
             return (
               <option key={id} value={id}>
-                {user.name || user.email || id}{id === currentUserId ? ' (vos)' : ''}
+                {getUserLabel(user, id)}
               </option>
             );
           })}
@@ -73,7 +74,7 @@ function CollaboratorsSelector({ users, collaborators, assignedTo, currentUserId
                 key={id}
                 className="inline-flex items-center gap-1 rounded border border-white/15 bg-white/5 px-2 py-0.5 text-[11px] text-white/80"
               >
-                {user.name || user.email || id}{id === currentUserId ? ' (vos)' : ''}
+                {getUserLabel(user, id)}
                 <button
                   type="button"
                   onClick={() => removeCollaborator(id)}
