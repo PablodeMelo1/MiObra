@@ -16,6 +16,20 @@ body {
   overflow-x: hidden;
 }
 
+body.menu-open {
+  overflow: hidden;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid rgb(103 232 249 / 0.9);
+  outline-offset: 2px;
+}
+
 #root {
   min-height: 100vh;
   min-width: 0;

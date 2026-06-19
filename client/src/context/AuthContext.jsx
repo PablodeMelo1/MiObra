@@ -41,26 +41,25 @@ export const AuthProvider = ({children}) => {
     };
 
     const signIn = async (user) => {
-        setIsLoading(true);
         try {
             const response = await loginRequest(user);
-            const sessionResponse = await verifySessionRequest();
-            setUser(sessionResponse.data?.user ?? sessionResponse.data);
+            setUser(response.data?.user ?? response.data);
             setIsAuthenticated(true);
             return response;
         } catch (error) {
             setUser(null);
             setIsAuthenticated(false);
             throw error;
-        } finally {
-            setIsLoading(false);
         }
     };
 
     const signOut = async () => {
-        await logoutRequest();
-        setUser(null);
-        setIsAuthenticated(false);
+        try {
+            await logoutRequest();
+        } finally {
+            setUser(null);
+            setIsAuthenticated(false);
+        }
     };
 
     return (

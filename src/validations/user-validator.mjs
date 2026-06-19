@@ -20,10 +20,22 @@ export const validateSingup = Joi.object({
     password: Joi.string().min(3).max(20).required(),
     profileImage: Joi.string().uri().optional(),
     profileImagePublicId: Joi.string().optional()
+}).messages({
+    'any.required': 'El campo {#label} es obligatorio',
+    'string.empty': 'El campo {#label} es obligatorio',
+    'string.min': 'El campo {#label} debe tener al menos {#limit} caracteres',
+    'string.max': 'El campo {#label} no puede superar {#limit} caracteres',
+    'string.pattern.base': 'El email ingresado no es valido',
 });
 
 
 export const validateLogin = Joi.object({
     email: Joi.string().regex(/.+@.+\..+/).required(),
     password: Joi.string().min(3).max(20).required()
+}).messages({
+    'any.required': 'El campo {#label} es obligatorio',
+    'string.empty': 'El campo {#label} es obligatorio',
+    'string.min': 'El campo {#label} debe tener al menos {#limit} caracteres',
+    'string.max': 'El campo {#label} no puede superar {#limit} caracteres',
+    'string.pattern.base': 'El email ingresado no es valido',
 });

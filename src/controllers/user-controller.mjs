@@ -72,7 +72,7 @@ export const loginUser = async (req, res) => {
         const userRepo = new UserRepository();
         const user = await userRepo.getByEmail(email);
         if (!user) {
-            return res.status(401).json({ message: "Error en login, verifique credenciales" });
+            return res.status(401).json({ message: "Email o contrasena incorrectos" });
         }
         const passwordHash = user.passwordHash;
         const validatePassword = await bcrypt.compare(password, passwordHash);
@@ -81,7 +81,7 @@ export const loginUser = async (req, res) => {
             signTokenAndSetCookie(res, user);
             res.status(200).json({ user: serializeUser(user) });
         } else {
-            res.status(401).json({ message: "Error en login, verifique credenciales" });
+            res.status(401).json({ message: "Email o contrasena incorrectos" });
         }
     } catch (error) {
         console.error('loginUser error:', error);
