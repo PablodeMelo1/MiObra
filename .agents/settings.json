@@ -1,0 +1,54 @@
+{
+  "$schema_comment": "Configuracion local del harness de MiObra. El flujo de trabajo es multiagente y secuencial: leader -> implementer -> reviewer.",
+  "harness": {
+    "name": "MiObra AI Harness",
+    "mode": "multi-agent-sequential",
+    "featureSource": "prompt",
+    "requiredStages": [
+      {
+        "order": 1,
+        "agent": "leader",
+        "definition": ".agents/agentes/leader.md",
+        "responsibility": "Analiza la solicitud, confirma el alcance y prepara el plan de ejecucion."
+      },
+      {
+        "order": 2,
+        "agent": "implementer",
+        "definition": ".agents/agentes/implementer.md",
+        "responsibility": "Implementa exactamente el scope definido por el leader y ajusta verificaciones cuando corresponda."
+      },
+      {
+        "order": 3,
+        "agent": "reviewer",
+        "definition": ".agents/agentes/reviewer.md",
+        "responsibility": "Revisa el diff, valida contra los docs y ejecuta la verificacion final disponible."
+      }
+    ],
+    "disabledSystems": [
+      "feature_list.json",
+      "progress/",
+      "CHECKPOINTS.md",
+      "init.sh"
+    ],
+    "verification": {
+      "frontendCommand": "npm run lint && npm run build:client",
+      "frontendPortableCommand": "npm run lint && npm run build:client",
+      "backendCommand": "npm run start",
+      "backendPortableCommand": "npm run start"
+    },
+    "postman": {
+      "mode": "local-file",
+      "collectionPath": "postman_collection.json",
+      "organization": "folders-by-module-or-feature"
+    }
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm run lint)",
+      "Bash(npm run build:client)",
+      "Bash(npm run start)",
+      "Bash(git status --short)",
+      "Bash(git diff*)"
+    ]
+  }
+}

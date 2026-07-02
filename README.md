@@ -1,11 +1,17 @@
-# Scandia
+# MiObra
 Sistema de gestion de obras.
 
 ## Desarrollo
 
-- Convenciones del proyecto: [CONVENTIONS.md](./CONVENTIONS.md)
+- Harness IA: [AGENTS.md](./AGENTS.md)
+- Arquitectura: [docs/architecture.md](./docs/architecture.md)
+- Convenciones: [docs/conventions.md](./docs/conventions.md)
+- Verificacion: [docs/verification.md](./docs/verification.md)
+- Convenciones rapidas: [CONVENTIONS.md](./CONVENTIONS.md)
 - Validar frontend: `npm run lint`
 - Build del cliente: `npm run build:client`
+- Levantar backend en desarrollo: `npm run dev`
+- Arranque de produccion local: `npm run start`
 
 ## Publicacion en Vercel
 
@@ -37,7 +43,7 @@ Pasos:
 
 1. Subir el repo a GitHub.
 2. Entrar a Vercel y elegir `Add New... > Project`.
-3. Importar el repositorio `Scandia`.
+3. Importar el repositorio `MiObra`.
 4. Dejar el framework como `Other`.
 5. Agregar las variables de entorno anteriores en `Settings > Environment Variables`.
 6. Hacer deploy.
@@ -70,6 +76,6 @@ Opcion por partes:
 MONGO_ATLAS=<cluster-host>
 MONGO_ATLAS_USER=<user>
 MONGO_ATLAS_PASS=<password>
-MONGO_ATLAS_DB=scandia_db
-MONGO_ATLAS_APP_NAME=Scandia
+MONGO_ATLAS_DB=miobra_db
+MONGO_ATLAS_APP_NAME=MiObra
 ```
