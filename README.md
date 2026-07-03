@@ -6,6 +6,8 @@ Sistema de gestion de obras.
 - Harness IA: [AGENTS.md](./AGENTS.md)
 - Arquitectura: [docs/architecture.md](./docs/architecture.md)
 - Convenciones: [docs/conventions.md](./docs/conventions.md)
+- Roadmap de producto: [docs/roadmap-producto.md](./docs/roadmap-producto.md)
+- SaaS multi-tenant: [docs/saas-multitenancy.md](./docs/saas-multitenancy.md)
 - Verificacion: [docs/verification.md](./docs/verification.md)
 - Convenciones rapidas: [CONVENTIONS.md](./CONVENTIONS.md)
 - Validar frontend: `npm run lint`
