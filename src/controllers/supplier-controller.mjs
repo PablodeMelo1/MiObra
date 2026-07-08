@@ -8,7 +8,7 @@ export const createSupplier = async (req, res) => {
         if (!name || !contactEmail) {
             return res.status(400).json({ message: "Faltan datos obligatorios" });
         }
-        const newSupplier = { name, contactEmail, contactPhone, address };
+        const newSupplier = { companyId: req.companyId, name, contactEmail, contactPhone, address };
         const createdSupplier = await supplierRepository.createOne(newSupplier);
         if (!createdSupplier) {
             return res.status(500).json({ message: "Error al crear el proveedor" });
@@ -23,7 +23,7 @@ export const getSupplierById = async (req, res) => {
     try {
         const supplierRepository = new supplierMongoRepository();
         const { id } = req.params;
-        const supplier = await supplierRepository.getById({ _id: id });
+        const supplier = await supplierRepository.getById({ _id: id, companyId: req.companyId });
         if (!supplier) {
             return res.status(404).json({ message: "Proveedor no encontrado" });
         }
@@ -38,8 +38,9 @@ export const updateSupplier = async (req, res) => {
     try {
         const supplierRepository = new supplierMongoRepository();
         const { id } = req.params;
-        const updateData = req.body;
-        const updatedSupplier = await supplierRepository.updateById({ _id: id }, updateData);
+        const updateData = { ...req.body };
+        delete updateData.companyId;
+        const updatedSupplier = await supplierRepository.updateById({ _id: id, companyId: req.companyId }, updateData);
         if (!updatedSupplier) {
             return res.status(404).json({ message: "Proveedor no encontrado o no se pudo actualizar" });
         }
@@ -53,7 +54,7 @@ export const deleteSupplier = async (req, res) => {
     try {
         const supplierRepository = new supplierMongoRepository();
         const { id } = req.params;
-        const deletedSupplier = await supplierRepository.deleteById({ _id: id });
+        const deletedSupplier = await supplierRepository.deleteById({ _id: id, companyId: req.companyId });
         if (!deletedSupplier) {
             return res.status(404).json({ message: "Proveedor no encontrado o no se pudo eliminar" });
         }
@@ -66,7 +67,7 @@ export const deleteSupplier = async (req, res) => {
 export const getAllSuppliers = async (req, res) => {
     try {
         const supplierRepository = new supplierMongoRepository();
-        const suppliers = await supplierRepository.getAll();
+        const suppliers = await supplierRepository.getAll(req.companyId);
         res.status(200).json({ suppliers });
     } catch (error) {
         throw createError("No pudo obtener los proveedores", 500);
@@ -79,10 +80,9 @@ export const searchSuppliersByName = async (req, res) => {
         if (!name) {
             return res.status(400).json({ message: "El parámetro 'name' es requerido" });
         }
-        const suppliers = await supplierRepository.searchByName(name);
+        const suppliers = await supplierRepository.searchByName(name, req.companyId);
         res.status(200).json({ suppliers });
     } catch (error) {
         throw createError("No pudo buscar los proveedores por nombre", 500);
     }
 }
-

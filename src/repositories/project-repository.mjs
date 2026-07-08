@@ -22,19 +22,19 @@ export default class projectMongoRepository {
         }
     }
 
-    async getAll() {
-        return Project.find();
+    async getAll(companyId) {
+        return Project.find({ companyId });
     }
 
     async getById(data) {
         return Project.findOne(data);
     }
 
-    async getByUserId(userIdInput) {
+    async getByUserId(userIdInput, companyId) {
         const userId = typeof userIdInput === 'string' ? userIdInput : userIdInput?.userId;
-        const projectMembers = await ProjectMember.find({ userId });
+        const projectMembers = await ProjectMember.find({ userId, companyId });
         const projectIds = projectMembers.map(pm => pm.projectId);
-        return Project.find({ _id: { $in: projectIds } });
+        return Project.find({ _id: { $in: projectIds }, companyId });
     }
 
 
@@ -42,13 +42,13 @@ export default class projectMongoRepository {
         try {
             const { _id } = data;
             if (!_id) {
-                console.log('Error deleting project: not come id by params', error);
+                throw new Error('Project id is required');
             }
-            const project = Project.findOne(_id);
+            const project = await Project.findOne({ _id, companyId: data.companyId });
             if (!project) {
-                console.log('Error deleting project: incorrect id', error);
+                return null;
             }
-            await Project.deleteOne({ _id });
+            return await Project.findOneAndDelete({ _id, companyId: data.companyId });
         } catch (error) {
             console.log('Error deleting project', error)
         }
@@ -69,8 +69,10 @@ export default class projectMongoRepository {
             if (!id) {
                 throw new Error('Project id is required');
             }
+            delete updateData.companyId;
+            delete updateData.createdByUserId;
 
-            return await Project.findByIdAndUpdate(id, updateData, {
+            return await Project.findOneAndUpdate({ _id: id, companyId: data.companyId }, updateData, {
                 new: true,
                 runValidators: true,
             });

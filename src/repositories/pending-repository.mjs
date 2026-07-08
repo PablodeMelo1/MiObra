@@ -8,25 +8,25 @@ export default class PendingRepository {
     return Pending.findById(saved._id).populate(PENDING_POPULATE);
   }
 
-  async getAllByUser(userId) {
-    return Pending.find({ collaborators: userId })
+  async getAllByUser(userId, companyId) {
+    return Pending.find({ collaborators: userId, companyId })
       .populate(PENDING_POPULATE)
       .sort({ createdAt: -1 });
   }
 
-  async getByIdForUser(id, userId) {
-    return Pending.findOne({ _id: id, collaborators: userId }).populate(PENDING_POPULATE);
+  async getByIdForUser(id, userId, companyId) {
+    return Pending.findOne({ _id: id, collaborators: userId, companyId }).populate(PENDING_POPULATE);
   }
 
-  async updateByIdForUser(id, userId, updateData = {}) {
+  async updateByIdForUser(id, userId, companyId, updateData = {}) {
     return Pending.findOneAndUpdate(
-      { _id: id, collaborators: userId },
+      { _id: id, collaborators: userId, companyId },
       updateData,
       { new: true, runValidators: true },
     ).populate(PENDING_POPULATE);
   }
 
-  async deleteByIdForUser(id, userId) {
-    return Pending.findOneAndDelete({ _id: id, collaborators: userId });
+  async deleteByIdForUser(id, userId, companyId) {
+    return Pending.findOneAndDelete({ _id: id, collaborators: userId, companyId });
   }
 }

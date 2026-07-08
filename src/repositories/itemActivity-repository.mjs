@@ -11,8 +11,8 @@ export default class itemActivityMongoRepository {
         }
     }
 
-    async findByItemAndUser(itemId, userId, zoneId = null) {
-        const query = { itemId, userId };
+    async findByItemAndUser(itemId, userId, zoneId = null, companyId) {
+        const query = { itemId, userId, companyId };
         if (zoneId) query.zoneId = zoneId;
         return await ItemActivity.findOne(query);
     }
@@ -65,8 +65,8 @@ export default class itemActivityMongoRepository {
         }
     }
 
-    async getByItemId(itemId, limit = 200) {
-        return ItemActivity.find({ itemId })
+    async getByItemId(itemId, limit = 200, companyId) {
+        return ItemActivity.find({ itemId, companyId })
             .sort({ updatedAt: -1 })
             .limit(limit)
             .populate('userId', 'name email')

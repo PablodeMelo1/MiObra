@@ -14,6 +14,7 @@ Sistema de gestion de obras.
 - Build del cliente: `npm run build:client`
 - Levantar backend en desarrollo: `npm run dev`
 - Arranque de produccion local: `npm run start`
+- Migrar datos existentes a empresa default: `npm run migrate:default-company`
 
 ## Publicacion en Vercel
 

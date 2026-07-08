@@ -11,7 +11,7 @@ const roleRows = [
 ];
 
 function Settings() {
-  const { user } = useAuth();
+  const { user, activeCompany, companyRole, companies } = useAuth();
 
   return (
     <div className="min-h-screen bg-[#0c0f14] text-white">
@@ -32,10 +32,23 @@ function Settings() {
                 <div>
                   <h2 className="text-sm font-semibold">Sesion actual</h2>
                   <p className="mt-1 text-xs text-white/55">{user?.name || user?.email || 'Usuario'}</p>
+                  <p className="mt-1 text-xs text-white/45">{activeCompany?.name || 'Sin empresa activa'}</p>
                 </div>
                 <span className="inline-flex w-fit rounded border border-cyan-300/25 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-100">
-                  Rol: {user?.role || user?.tipoUsuario || 'user'}
+                  Rol empresa: {companyRole || 'sin rol'}
                 </span>
+              </div>
+            </section>
+
+            <section className="rounded-xl border border-white/10 bg-[#111723] p-4">
+              <h2 className="text-sm font-semibold">Empresas disponibles</h2>
+              <div className="mt-3 grid gap-2">
+                {(companies || []).map((membership) => (
+                  <div key={membership.companyId} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm">
+                    <span className="truncate">{membership.company?.name || 'Empresa'}</span>
+                    <span className="ml-3 shrink-0 text-xs text-white/55">{membership.role}</span>
+                  </div>
+                ))}
               </div>
             </section>
 

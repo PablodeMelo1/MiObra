@@ -12,6 +12,7 @@
     "dev": "nodemon src/app.mjs",
     "lint": "npm --prefix client run lint",
     "build:client": "npm --prefix client run build",
+    "migrate:default-company": "node scripts/migrate-default-company.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {

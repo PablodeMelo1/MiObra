@@ -15,18 +15,18 @@ export default class commentMongoRepository {
         return Comment.findOne(data);
     }
 
-    async getByEntity({ entityType, entityId }) {
-        return Comment.find({ entityType, entityId }).populate('userId', 'name email').sort({ createdAt: 1 });
+    async getByEntity({ entityType, entityId, companyId }) {
+        return Comment.find({ entityType, entityId, companyId }).populate('userId', 'name email').sort({ createdAt: 1 });
     }
 
     async updateById(data, update) {
-        return Comment.findByIdAndUpdate(data._id, update, { new: true }).populate('userId', 'name email');
+        return Comment.findOneAndUpdate({ _id: data._id, companyId: data.companyId }, update, { new: true }).populate('userId', 'name email');
     }
 
     async deleteById(data) {
         const { _id } = data;
-        const comment = await Comment.findById(_id);
+        const comment = await Comment.findOne({ _id, companyId: data.companyId });
         if (!comment) throw new Error('Comentario no encontrado');
-        await Comment.deleteOne({ _id });
+        return Comment.deleteOne({ _id, companyId: data.companyId });
     }
 }

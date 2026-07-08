@@ -3,6 +3,7 @@ import { ITEM_TYPES } from '../constants/itemType.mjs';
 
 const ITEM_TYPES_VALUES = Object.values(ITEM_TYPES);
 const itemSchema = new mongoose.Schema({
+    companyId: { type: mongoose.Types.ObjectId, ref: 'Company', required: true, index: true },
     name: { type: String, required: true },
     profileImage: { type: String }, // URL de Cloudinary
     profileImagePublicId: { type: String }, // Public ID para eliminar de Cloudinary
@@ -15,5 +16,8 @@ const itemSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
+
+itemSchema.index({ companyId: 1, itemType: 1 });
+itemSchema.index({ companyId: 1, zoneId: 1 });
 
 export default mongoose.model('Item', itemSchema);

@@ -7,8 +7,8 @@ export default class inventoryMovementMongoRepository {
     }
 
     
-    async getAll(limit = 500) {
-        return InventoryMovement.find({})
+    async getAll(limit = 500, companyId) {
+        return InventoryMovement.find({ companyId })
             .sort({ createdAt: -1 })
             .limit(limit)
             .populate('userId', 'name email')

@@ -13,12 +13,12 @@ export default class taskMongoRepository {
         }
     }
 
-    async getAll() {
-        return await Task.find();
+    async getAll(companyId) {
+        return await Task.find({ companyId });
     }
 
-    async getAllByProjectId(projectId) {
-        return await Task.find({ projectId });
+    async getAllByProjectId(projectId, companyId) {
+        return await Task.find({ projectId, companyId });
     }
 
     async getAllTasksByProject(projectId) {
@@ -26,8 +26,8 @@ export default class taskMongoRepository {
     }
 
     async getByUserAndProject(data) {
-        const { userId, project } = data;
-        return await Task.find({ assignedTo: userId, project });
+        const { userId, project, companyId } = data;
+        return await Task.find({ assignedTo: userId, projectId: project, companyId });
     }
 
     async getById(data) {
@@ -35,9 +35,9 @@ export default class taskMongoRepository {
     }
 
     async getByIdAndProject(data) {
-        const { _id, project, projectId } = data;
+        const { _id, project, projectId, companyId } = data;
         const effectiveProjectId = projectId || project;
-        return Task.findOne({ _id, projectId: effectiveProjectId });
+        return Task.findOne({ _id, projectId: effectiveProjectId, companyId });
     }
 
     async deleteById(data) {
@@ -46,11 +46,11 @@ export default class taskMongoRepository {
             if (!_id) {
                 throw new Error("Error al obtener el id")
             }
-            const task = await Task.findById(_id);
+            const task = await Task.findOne({ _id, companyId: data.companyId });
             if (!task) {
                 throw new Error("Task with this id not found");
             }
-            await Task.deleteOne({ _id });
+            return await Task.findOneAndDelete({ _id, companyId: data.companyId });
         } catch (error) {
             throw new Error('error deleting a tast');
         }
@@ -61,13 +61,13 @@ export default class taskMongoRepository {
     }
     //actualiza la tarea
     async updateTask(data) {
-        const { _id, projectId, ...updateData } = data;
-        return Task.findOneAndUpdate({ _id, projectId }, updateData, { new: true });
+        const { _id, projectId, companyId, ...updateData } = data;
+        return Task.findOneAndUpdate({ _id, projectId, companyId }, updateData, { new: true });
     }
 
     async getTasksByList(data) {
-        const { projectId, list } = data;
-        return Task.find({ projectId, list });
+        const { projectId, list, companyId } = data;
+        return Task.find({ projectId, list, companyId });
     }
 
     async getTasksByContextText({ text }) {
@@ -84,17 +84,17 @@ export default class taskMongoRepository {
     }
 
     async updateStatus(data) {
-        const { _id, status } = data;
-        return Task.findOneAndUpdate({ _id }, { status }, { new: true });
+        const { _id, status, companyId } = data;
+        return Task.findOneAndUpdate({ _id, companyId }, { status }, { new: true });
     }
 
     async updatePriority(data) {
-        const { _id, priority } = data;
-        return Task.findOneAndUpdate({ _id }, { priority }, { new: true })
+        const { _id, priority, companyId } = data;
+        return Task.findOneAndUpdate({ _id, companyId }, { priority }, { new: true })
     }
     async updateAssigned(data) {
-        const { _id, assignedTo } = data;
-        return Task.findOneAndUpdate({ _id }, { assignedTo }, { new: true })
+        const { _id, assignedTo, companyId } = data;
+        return Task.findOneAndUpdate({ _id, companyId }, { assignedTo }, { new: true })
     }
 
 }

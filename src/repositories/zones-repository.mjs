@@ -10,27 +10,28 @@ export default class ZoneMongoRepository {
         }
     }
 
-    async getZoneById(id) {
+    async getZoneById(id, companyId) {
         try {
-            return await Zone.findById(id);
+            return await Zone.findOne({ _id: id, companyId });
         } catch (error) {
             console.error('Error fetching zone by ID:', error);
             throw new Error('Could not fetch zone');
         }
     }
 
-    async getAll() {
+    async getAll(companyId) {
         try {
-            return await Zone.find({});
+            return await Zone.find({ companyId });
         } catch (error) {
             console.error('Error fetching zones:', error);
             throw new Error('Could not fetch zones');
         }
     }
 
-    async updateById(id, data) {
+    async updateById(id, companyId, data) {
         try {
-            const updated = await Zone.findByIdAndUpdate(id, data, { new: true });
+            delete data.companyId;
+            const updated = await Zone.findOneAndUpdate({ _id: id, companyId }, data, { new: true });
             return updated;
         } catch (error) {
             console.error('Error updating zone:', error);
@@ -38,9 +39,9 @@ export default class ZoneMongoRepository {
         }
     }
 
-    async deleteById(id) {
+    async deleteById(id, companyId) {
         try {
-            const deleted = await Zone.findByIdAndDelete(id);
+            const deleted = await Zone.findOneAndDelete({ _id: id, companyId });
             return deleted;
         } catch (error) {
             console.error('Error deleting zone:', error);

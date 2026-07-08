@@ -10,7 +10,7 @@ import {
 } from "../../controllers/user-controller.mjs";
 import { auth } from "../../middleware/auth-middleware.mjs";
 import { requireRole } from "../../middleware/role-middleware.mjs";
-import { userRoles } from "../../constants/userRole.mjs";
+import { COMPANY_ROLES } from "../../constants/companyRoles.mjs";
 
 
 const routes = express.Router();
@@ -18,9 +18,9 @@ const routes = express.Router();
 routes.get("/", auth, getAll);
 routes.get("/:id", auth, getUserById);
 routes.put("/:id", auth, updateUser);
-routes.delete("/:id", auth, deleteUser);
+routes.delete("/:id", auth, requireRole(COMPANY_ROLES.OWNER, COMPANY_ROLES.ADMIN), deleteUser);
 
-// Solo el admin puede cambiar el rol de un usuario
-routes.patch("/:id/role", auth, requireRole(userRoles.ADMIN), changeUserRole);
+// Solo owner/admin de la empresa activa pueden cambiar roles de membresia.
+routes.patch("/:id/role", auth, requireRole(COMPANY_ROLES.OWNER, COMPANY_ROLES.ADMIN), changeUserRole);
 
 export default routes;

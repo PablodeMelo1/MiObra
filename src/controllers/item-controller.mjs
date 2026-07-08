@@ -1,5 +1,6 @@
 import { createError } from '../error/create-error.mjs';
 import ItemRepository from '../repositories/item-repository.mjs';
+import ZoneRepository from '../repositories/zones-repository.mjs';
 import { ITEM_TYPES } from '../constants/itemType.mjs';
 
 const normalizeByType = (itemType, totalQuantity, availableQuantity, fallbackTotal = 1, fallbackAvailable = 1) => {
@@ -19,6 +20,13 @@ const normalizeByType = (itemType, totalQuantity, availableQuantity, fallbackTot
   };
 };
 
+const validateZoneInCompany = async (zoneId, companyId) => {
+  if (!zoneId) return true;
+  const zoneRepo = new ZoneRepository();
+  const zone = await zoneRepo.getZoneById(zoneId, companyId);
+  return Boolean(zone);
+};
+
 export const createItem = async (req, res) => {
   try {
     const repo = new ItemRepository();
@@ -29,8 +37,12 @@ export const createItem = async (req, res) => {
     }
 
     const normalized = normalizeByType(itemType, totalQuantity, availableQuantity);
+    if (!(await validateZoneInCompany(zoneId, req.companyId))) {
+      return res.status(404).json({ message: 'Zona no encontrada' });
+    }
 
     const data = {
+      companyId: req.companyId,
       name,
       itemType,
       description,
@@ -53,7 +65,7 @@ export const getAllItems = async (req, res) => {
   try {
     const repo = new ItemRepository();
     const { zoneId, itemType } = req.query;
-    const filter = {};
+    const filter = { companyId: req.companyId };
     if (zoneId) filter.zoneId = zoneId;
     if (itemType) filter.itemType = itemType;
     const items = await repo.getAll(filter);
@@ -68,7 +80,7 @@ export const getItemById = async (req, res) => {
     const repo = new ItemRepository();
     const { id } = req.params;
     if (!id) return res.status(400).json({ message: 'id es requerido' });
-    const item = await repo.getById(id);
+    const item = await repo.getById(id, req.companyId);
     if (!item) return res.status(404).json({ message: 'Item no encontrado' });
     res.status(200).json(item);
   } catch (error) {
@@ -83,10 +95,13 @@ export const updateItem = async (req, res) => {
     const updateData = { ...req.body };
     if (!id) return res.status(400).json({ message: 'id es requerido' });
 
-    const current = await repo.getById(id);
+    const current = await repo.getById(id, req.companyId);
     if (!current) return res.status(404).json({ message: 'Item no encontrado' });
 
     const nextType = updateData.itemType || current.itemType;
+    if (!(await validateZoneInCompany(updateData.zoneId, req.companyId))) {
+      return res.status(404).json({ message: 'Zona no encontrada' });
+    }
     const normalized = normalizeByType(
       nextType,
       updateData.totalQuantity,
@@ -99,6 +114,7 @@ export const updateItem = async (req, res) => {
     updateData.totalQuantity = normalized.totalQuantity;
     updateData.availableQuantity = normalized.availableQuantity;
 
+    updateData.companyId = req.companyId;
     const updated = await repo.updateById(id, updateData);
     if (!updated) return res.status(404).json({ message: 'Item no encontrado' });
     res.status(200).json(updated);
@@ -112,7 +128,7 @@ export const deleteItem = async (req, res) => {
     const repo = new ItemRepository();
     const { id } = req.params;
     if (!id) return res.status(400).json({ message: 'id es requerido' });
-    const deleted = await repo.deleteById(id);
+    const deleted = await repo.deleteById({ _id: id, companyId: req.companyId });
     if (!deleted) return res.status(404).json({ message: 'Item no encontrado' });
     res.status(200).json({ message: 'Item eliminado correctamente' });
   } catch (error) {
