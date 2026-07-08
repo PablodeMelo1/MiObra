@@ -3,9 +3,17 @@ import { createError } from '../error/create-error.mjs';
 import ItemRepository from '../repositories/item-repository.mjs';
 import ItemActivityRepository from '../repositories/itemActivity-repository.mjs';
 import InventoryMovementRepository from '../repositories/inventoryMovement-repository.mjs';
+import CompanyMemberRepository from '../repositories/companyMember-repository.mjs';
 
-const buildActivity = ({ itemId, userId, type, quantity, remainingQuantity, status, zoneId }) => ({
+const isUserInCompany = async (userId, companyId) => {
+    const memberRepo = new CompanyMemberRepository();
+    const memberIds = await memberRepo.findActiveUserIdsByCompanyId(companyId);
+    return memberIds.some((memberId) => String(memberId) === String(userId));
+};
+
+const buildActivity = ({ itemId, userId, type, quantity, remainingQuantity, status, zoneId, companyId }) => ({
     _id: new mongoose.Types.ObjectId(),
+    companyId,
     itemId,
     userId,
     type,
@@ -15,8 +23,9 @@ const buildActivity = ({ itemId, userId, type, quantity, remainingQuantity, stat
     zoneId: zoneId || null,
 });
 
-const buildMovement = ({ itemId, itemName, itemType, userId, type, quantity, zoneId }) => ({
+const buildMovement = ({ itemId, itemName, itemType, userId, type, quantity, zoneId, companyId }) => ({
     _id: new mongoose.Types.ObjectId(),
+    companyId,
     itemId,
     itemName,
     itemType,
@@ -33,11 +42,15 @@ export const checkout = async (req, res) => {
         const movementRepo = new InventoryMovementRepository();
 
         const { id } = req.params;
+        const companyId = req.companyId;
         const userId = req.body?.userId || req.user?.id;
         const { quantity } = req.body;
 
         if (!userId || quantity == null) {
             return res.status(400).json({ message: 'userId y quantity son requeridos' });
+        }
+        if (!(await isUserInCompany(userId, companyId))) {
+            return res.status(403).json({ message: 'El usuario no pertenece a la empresa activa' });
         }
 
         const qty = Number(quantity);
@@ -45,7 +58,7 @@ export const checkout = async (req, res) => {
             return res.status(400).json({ message: 'quantity debe ser un número mayor a 0' });
         }
 
-        const item = await itemRepo.getById(id);
+        const item = await itemRepo.getById(id, companyId);
         if (!item) {
             return res.status(404).json({ message: 'Item no encontrado' });
         }
@@ -59,9 +72,9 @@ export const checkout = async (req, res) => {
         }
 
 
-        const updatedItem = await itemRepo.decrementAvailableQuantity(id, qty);
+        const updatedItem = await itemRepo.decrementAvailableQuantity(id, qty, companyId);
 
-        const existingActivity = await activityRepo.findByItemAndUser(id, userId, item.zoneId || null);
+        const existingActivity = await activityRepo.findByItemAndUser(id, userId, item.zoneId || null, companyId);
         let consolidatedActivity;
 
         if (existingActivity) {
@@ -75,6 +88,7 @@ export const checkout = async (req, res) => {
                 remainingQuantity: qty,
                 status: 'OPEN',
                 zoneId: item.zoneId,
+                companyId,
             }));
         }
 
@@ -86,6 +100,7 @@ export const checkout = async (req, res) => {
             type: 'CHECK_OUT',
             quantity: qty,
             zoneId: item.zoneId,
+            companyId,
         }));
 
         res.status(201).json({ item: updatedItem, activity: consolidatedActivity, movement });
@@ -101,11 +116,15 @@ export const checkin = async (req, res) => {
         const movementRepo = new InventoryMovementRepository();
 
         const { id } = req.params;
+        const companyId = req.companyId;
         const userId = req.body?.userId || req.user?.id;
         const { quantity } = req.body;
 
         if (!userId || quantity == null) {
             return res.status(400).json({ message: 'userId y quantity son requeridos' });
+        }
+        if (!(await isUserInCompany(userId, companyId))) {
+            return res.status(403).json({ message: 'El usuario no pertenece a la empresa activa' });
         }
 
         const qty = Number(quantity);
@@ -114,14 +133,14 @@ export const checkin = async (req, res) => {
         }
 
         // verify item exists and obtain zoneId
-        const item = await itemRepo.getById(id);
+        const item = await itemRepo.getById(id, companyId);
         if (!item) {
             return res.status(404).json({ message: 'Item no encontrado' });
         }
 
         const zoneId = item.zoneId || null;
 
-        const userActivity = await activityRepo.findByItemAndUser(id, userId, zoneId);
+        const userActivity = await activityRepo.findByItemAndUser(id, userId, zoneId, companyId);
 
         if (!userActivity || (userActivity.remainingQuantity || 0) <= 0) {
             return res.status(404).json({ message: 'No existe cantidad pendiente para devolver de este item y usuario' });
@@ -131,7 +150,7 @@ export const checkin = async (req, res) => {
             return res.status(400).json({ message: 'Quantity mayor al remainingQuantity de la actividad' });
         }
 
-        const updatedItem = await itemRepo.incrementAvailableQuantity(id, qty);
+        const updatedItem = await itemRepo.incrementAvailableQuantity(id, qty, companyId);
 
         const newRemaining = userActivity.remainingQuantity - qty;
         let consolidatedActivity;
@@ -151,6 +170,7 @@ export const checkin = async (req, res) => {
             type: 'CHECK_IN',
             quantity: qty,
             zoneId,
+            companyId,
         }));
 
         res.status(200).json({ item: updatedItem, activity: consolidatedActivity, movement });
@@ -169,7 +189,7 @@ export const getItemActivities = async (req, res) => {
             return res.status(400).json({ message: 'id es requerido' });
         }
 
-        const activities = await activityRepo.getByItemId(id, Number.isFinite(limit) ? limit : 200);
+        const activities = await activityRepo.getByItemId(id, Number.isFinite(limit) ? limit : 200, req.companyId);
         res.status(200).json(activities);
     } catch (error) {
         throw createError('Error al obtener historial del item', 500);
@@ -180,7 +200,7 @@ export const getInventoryActivities = async (req, res) => {
     try {
         const movementRepo = new InventoryMovementRepository();
         const limit = Number(req.query?.limit || 500);
-        const activities = await movementRepo.getAll(Number.isFinite(limit) ? limit : 500);
+        const activities = await movementRepo.getAll(Number.isFinite(limit) ? limit : 500, req.companyId);
         res.status(200).json(activities);
     } catch (error) {
         throw createError('Error al obtener historial global del inventario', 500);

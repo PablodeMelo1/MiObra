@@ -14,10 +14,10 @@ export default class groupMongoRepository {
 
     async deleteById(data) {
         try {
-            const {_id} = data;
-            const group = Group.findById(_id);
+            const {_id, companyId} = data;
+            const group = await Group.findOne({ _id, companyId });
             if(!group) throw new Error("Id incorrecto: ", _id);
-            await Group.deleteOne(group);
+            return await Group.findOneAndDelete({ _id, companyId });
         } catch (error) {
             throw new Error("Error deleting a group", error.message);
         }
@@ -25,8 +25,9 @@ export default class groupMongoRepository {
 
     async updateById(data) {
         try {
-            const {_id, ...updateData} = data;
-            return Group.findOneAndUpdate({_id}, updateData, {new: true});
+            const {_id, companyId, ...updateData} = data;
+            delete updateData.companyId;
+            return Group.findOneAndUpdate({_id, companyId}, updateData, {new: true});
         } catch (error) {
             throw new Error("Error updating a group", error.message);
         }
@@ -40,17 +41,17 @@ export default class groupMongoRepository {
         }
     }
 
-    async getAll() {
+    async getAll(companyId) {
         try {
-            return Group.find();
+            return Group.find({ companyId });
         } catch (error) {
             throw new Error("Error getting all groups", error.message);
         }
     }
 
-    async getByUserId(userId) {
+    async getByUserId(userId, companyId) {
         try {
-            return Group.find({ users: userId });
+            return Group.find({ users: userId, companyId });
         } catch (error) {
             throw new Error("Error getting groups by user", error.message);
         }

@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const inventoryMovementSchema = new mongoose.Schema({
   _id: { type: mongoose.Types.ObjectId, required: true },
+  companyId: { type: mongoose.Types.ObjectId, ref: 'Company', required: true, index: true },
   itemId: { type: mongoose.Types.ObjectId, ref: 'Item', required: true },
   itemName: { type: String, required: true },
   itemType: { type: String },
@@ -11,5 +12,7 @@ const inventoryMovementSchema = new mongoose.Schema({
   quantity: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },
 });
+
+inventoryMovementSchema.index({ companyId: 1, createdAt: -1 });
 
 export default mongoose.model('InventoryMovement', inventoryMovementSchema);

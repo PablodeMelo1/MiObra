@@ -41,6 +41,9 @@ export const buildCreatePendingPayload = ({ body, userId }) => {
 export const buildUpdatePendingPayload = ({ currentPending, updateData, userId }) => {
   const sanitized = { ...updateData };
   delete sanitized.createdBy;
+  delete sanitized.companyId;
+  delete sanitized.createdAt;
+  delete sanitized.updatedAt;
 
   const currentCollaborators = uniqueStringIds(
     (currentPending.collaborators || []).map((collaborator) => collaborator?._id || collaborator),

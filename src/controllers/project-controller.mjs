@@ -7,11 +7,12 @@ import { PROJECT_ROLE } from '../constants/projectRoles.mjs';
 export const createProject = async (req, res) => {
     const userId = req.user && req.user.id;
     if (!userId) return res.status(401).json({ message: 'Usuario no autenticado' });
+    const companyId = req.companyId;
 
     const { name, description, location, startDate, endDate, lists } = req.body || {};
     if (!name) return res.status(400).json({ message: 'Faltan datos obligatorios' });
 
-    const newProject = { name, description, location, startDate, endDate, lists };
+    const newProject = { companyId, name, description, location, startDate, endDate, lists };
 
     const projectRepo = new projectRepository();
     const memberRepo = new ProjectMemberRepository();
@@ -22,6 +23,7 @@ export const createProject = async (req, res) => {
         const memberData = {
             userId,
             projectId: createdProject._id,
+            companyId,
             role: PROJECT_ROLE.OWNER,
         };
 
@@ -48,13 +50,13 @@ export const getProjectById = async (req, res) => {
             return res.status(401).json({ message: 'Usuario no autenticado' });
         }
 
-        const memberships = await memberRepo.findByUserId(userId);
+        const memberships = await memberRepo.findByUserId(userId, req.companyId);
         const isMember = memberships.some((member) => String(member.projectId) === String(id));
         if (!isMember) {
             return res.status(403).json({ message: 'No tienes permisos para ver este proyecto' });
         }
 
-        const project = await projectRepo.getById({ _id: id });
+        const project = await projectRepo.getById({ _id: id, companyId: req.companyId });
         if (!project) {
             return res.status(404).json({ message: "Proyecto no encontrado" });
         }
@@ -76,14 +78,16 @@ export const updateProject = async (req, res) => {
             return res.status(401).json({ message: 'Usuario no autenticado' });
         }
 
-        const memberships = await memberRepo.findByUserId(userId);
+        const memberships = await memberRepo.findByUserId(userId, req.companyId);
         const isMember = memberships.some((member) => String(member.projectId) === String(id));
         if (!isMember) {
             return res.status(403).json({ message: 'No tienes permisos para modificar este proyecto' });
         }
 
-        const updateData = req.body;
-        const updatedProject = await projectRepo.updateById({ _id: id }, updateData);
+        const updateData = { ...req.body };
+        delete updateData.companyId;
+        delete updateData.createdByUserId;
+        const updatedProject = await projectRepo.updateById({ _id: id, companyId: req.companyId }, updateData);
         if (!updatedProject) {
             return res.status(404).json({ message: "Proyecto no encontrado o no se pudo actualizar" });
         }
@@ -105,13 +109,13 @@ export const deleteProject = async (req, res) => {
             return res.status(401).json({ message: 'Usuario no autenticado' });
         }
 
-        const memberships = await memberRepo.findByUserId(userId);
+        const memberships = await memberRepo.findByUserId(userId, req.companyId);
         const isMember = memberships.some((member) => String(member.projectId) === String(id));
         if (!isMember) {
             return res.status(403).json({ message: 'No tienes permisos para eliminar este proyecto' });
         }
 
-        const deletedProject = await projectRepo.deleteById({ _id: id });
+        const deletedProject = await projectRepo.deleteById({ _id: id, companyId: req.companyId });
         if (!deletedProject) {
             return res.status(404).json({ message: "Proyecto no encontrado o no se pudo eliminar" });
         }
@@ -136,7 +140,7 @@ export const getAllProjectsByUser = async (req, res) => {
             return res.status(403).json({ message: 'No tienes permisos para consultar estos proyectos' });
         }
 
-        const projects = await projectRepo.getByUserId(authUserId);
+        const projects = await projectRepo.getByUserId(authUserId, req.companyId);
         res.status(200).json({ projects });
     }
     catch (error) {
@@ -152,7 +156,7 @@ export const getAllProjects = async (req, res) => {
             return res.status(401).json({ message: 'Usuario no autenticado' });
         }
 
-        const projects = await projectRepo.getByUserId(userId);
+        const projects = await projectRepo.getByUserId(userId, req.companyId);
         res.status(200).json({ projects });
     } catch (error) {
         throw createError("No pudo obtener los proyectos", 500);
@@ -168,10 +172,9 @@ export const getAllProjectsCatalog = async (req, res) => {
             return res.status(401).json({ message: 'Usuario no autenticado' });
         }
 
-        const projects = await projectRepo.getAll();
+        const projects = await projectRepo.getAll(req.companyId);
         return res.status(200).json({ projects });
     } catch (error) {
         throw createError('No pudo obtener el catalogo de proyectos', 500);
     }
 }
-

@@ -5,6 +5,7 @@ const { ObjectId } = Types;
 const STATUS = ['PEDIDO', 'COMPRADO', 'RECIBIDO'];
 
 const materialRequestSchema = new mongoose.Schema({
+    companyId: { type: ObjectId, ref: 'Company', required: true, index: true },
     materialName: { type: String, required: true, trim: true },
     description: { type: String, default: '' },
     quantity: { type: Number, required: true, min: 1 },
@@ -20,5 +21,7 @@ const materialRequestSchema = new mongoose.Schema({
     projectId: { type: ObjectId, ref: 'Project', default: null },
     createdBy: { type: ObjectId, ref: 'User', required: true, immutable: true },
 }, { timestamps: true });
+
+materialRequestSchema.index({ companyId: 1, createdAt: -1 });
 
 export default mongoose.model('MaterialRequest', materialRequestSchema);

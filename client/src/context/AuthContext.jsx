@@ -1,11 +1,45 @@
 import { useEffect, useState } from 'react';
-import { registerRequest, loginRequest, verifySessionRequest, logoutRequest } from '../api/auth';
+import { registerRequest, loginRequest, verifySessionRequest, logoutRequest, switchActiveCompanyRequest } from '../api/auth';
 import { AuthContext } from './auth-context';
+
+const resolveUser = (payload) => payload?.user ?? payload;
+const resolveCompanies = (payload) => payload?.companies ?? [];
+
+const persistActiveCompanyId = (activeCompanyId) => {
+    if (activeCompanyId) {
+        window.localStorage.setItem('activeCompanyId', activeCompanyId);
+    } else {
+        window.localStorage.removeItem('activeCompanyId');
+    }
+};
 
 export const AuthProvider = ({children}) => {
     const [user, setUser] = useState(null);
+    const [companies, setCompanies] = useState([]);
+    const [activeCompany, setActiveCompany] = useState(null);
+    const [companyRole, setCompanyRole] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+
+    const applyAuthPayload = (payload) => {
+        const nextUser = resolveUser(payload);
+        const nextCompanies = resolveCompanies(payload);
+        setUser(nextUser);
+        setCompanies(nextCompanies);
+        setActiveCompany(payload?.activeCompany ?? null);
+        setCompanyRole(payload?.companyRole ?? null);
+        persistActiveCompanyId(payload?.activeCompanyId ?? payload?.activeCompany?._id ?? null);
+        setIsAuthenticated(Boolean(nextUser));
+    };
+
+    const clearAuthPayload = () => {
+        setUser(null);
+        setCompanies([]);
+        setActiveCompany(null);
+        setCompanyRole(null);
+        persistActiveCompanyId(null);
+        setIsAuthenticated(false);
+    };
 
     useEffect(() => {
         let isMounted = true;
@@ -15,12 +49,10 @@ export const AuthProvider = ({children}) => {
             try {
                 const response = await verifySessionRequest();
                 if (!isMounted) return;
-                setUser(response.data?.user ?? response.data);
-                setIsAuthenticated(true);
+                applyAuthPayload(response.data);
             } catch {
                 if (!isMounted) return;
-                setUser(null);
-                setIsAuthenticated(false);
+                clearAuthPayload();
             } finally {
                 if (isMounted) setIsLoading(false);
             }
@@ -35,35 +67,37 @@ export const AuthProvider = ({children}) => {
     
     const signUp = async (user) => {
         const response = await registerRequest(user);
-        setUser(response.data?.user ?? response.data);
-        setIsAuthenticated(true);
+        applyAuthPayload(response.data);
         return response;
     };
 
     const signIn = async (user) => {
         try {
             const response = await loginRequest(user);
-            setUser(response.data?.user ?? response.data);
-            setIsAuthenticated(true);
+            applyAuthPayload(response.data);
             return response;
         } catch (error) {
-            setUser(null);
-            setIsAuthenticated(false);
+            clearAuthPayload();
             throw error;
         }
+    };
+
+    const switchCompany = async (companyId) => {
+        const response = await switchActiveCompanyRequest(companyId);
+        applyAuthPayload(response.data);
+        return response;
     };
 
     const signOut = async () => {
         try {
             await logoutRequest();
         } finally {
-            setUser(null);
-            setIsAuthenticated(false);
+            clearAuthPayload();
         }
     };
 
     return (
-        <AuthContext.Provider value={{signUp, signIn, signOut, user, isAuthenticated, isLoading}}>
+        <AuthContext.Provider value={{signUp, signIn, signOut, switchCompany, user, companies, activeCompany, companyRole, isAuthenticated, isLoading}}>
             {children}
         </AuthContext.Provider>
     );

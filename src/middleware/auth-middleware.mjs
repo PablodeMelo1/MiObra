@@ -1,13 +1,12 @@
 import jwt from "jsonwebtoken";
 import "dotenv/config";
 import { validateAuth } from "../validations/user-validator.mjs";
+import { loadCompanyContext } from "./company-context-middleware.mjs";
 
 const { PASS_JWT } = process.env;
 
 
 export const authMiddleware = (req, res, next) => {
-    console.log("Entro en auth");
-
     try {
         // try cookie first, then Authorization header
         const tokenFromCookie = req.cookies && req.cookies.token;
@@ -35,7 +34,6 @@ export const authMiddleware = (req, res, next) => {
                 ...value,
                 tipoUsuario: value.tipoUsuario
             };
-            console.log('Value', req.user)
             //se sigue adelante con next
             next();
         }
@@ -44,4 +42,4 @@ export const authMiddleware = (req, res, next) => {
     }
 }
 
-export const auth = authMiddleware;
+export const auth = [authMiddleware, loadCompanyContext()];

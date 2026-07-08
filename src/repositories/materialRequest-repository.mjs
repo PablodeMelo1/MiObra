@@ -6,8 +6,8 @@ export default class MaterialRequestRepository {
     return materialRequest.save();
   }
 
-  async getAll() {
-    return MaterialRequest.find()
+  async getAll(companyId) {
+    return MaterialRequest.find({ companyId })
       .populate('supplierId', 'name contactEmail')
       .populate('projectId', 'name')
       .populate('createdBy', 'name email')
@@ -16,7 +16,7 @@ export default class MaterialRequestRepository {
 
   async getById(data) {
     const id = typeof data === 'string' ? data : data?._id;
-    return MaterialRequest.findById(id)
+    return MaterialRequest.findOne({ _id: id, companyId: data?.companyId })
       .populate('supplierId', 'name contactEmail')
       .populate('projectId', 'name')
       .populate('createdBy', 'name email');
@@ -24,12 +24,12 @@ export default class MaterialRequestRepository {
 
   async deleteById(data) {
     const id = typeof data === 'string' ? data : data?._id;
-    return MaterialRequest.findByIdAndDelete(id);
+    return MaterialRequest.findOneAndDelete({ _id: id, companyId: data?.companyId });
   }
 
   async updateById(data, updateData = {}) {
     const id = typeof data === 'string' ? data : data?._id;
-    return MaterialRequest.findByIdAndUpdate(id, updateData, {
+    return MaterialRequest.findOneAndUpdate({ _id: id, companyId: data?.companyId }, updateData, {
       new: true,
       runValidators: true,
     })
@@ -39,8 +39,8 @@ export default class MaterialRequestRepository {
   }
 
   async updateStatus(data) {
-    const { _id, status } = data;
-    return MaterialRequest.findByIdAndUpdate(_id, { status }, { new: true, runValidators: true })
+    const { _id, status, companyId } = data;
+    return MaterialRequest.findOneAndUpdate({ _id, companyId }, { status }, { new: true, runValidators: true })
       .populate('supplierId', 'name contactEmail')
       .populate('projectId', 'name')
       .populate('createdBy', 'name email');

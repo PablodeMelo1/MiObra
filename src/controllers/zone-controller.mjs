@@ -7,7 +7,7 @@ export const createZone = async (req, res) => {
         const body = req.body || {};
         const { name, description } = body;
         if (!name) return res.status(400).json({ message: 'El nombre es obligatorio' });
-        const newZone = { name, description };
+        const newZone = { companyId: req.companyId, name, description };
         const created = await repo.createZone(newZone);
         if (!created) return res.status(500).json({ message: 'Error al crear la zona' });
         res.status(201).json(created);
@@ -21,7 +21,7 @@ export const getZoneById = async (req, res) => {
     try {
         const repo = new ZoneRepository();
         const { id } = req.params;
-        const zone = await repo.getZoneById(id);
+        const zone = await repo.getZoneById(id, req.companyId);
         if (!zone) return res.status(404).json({ message: 'Zona no encontrada' });
         res.status(200).json(zone);
     } catch (error) {
@@ -32,7 +32,7 @@ export const getZoneById = async (req, res) => {
 export const getAllZones = async (req, res) => {
     try {
         const repo = new ZoneRepository();
-        const zones = await repo.getAll();
+        const zones = await repo.getAll(req.companyId);
         res.status(200).json(zones);
     } catch (error) {
         throw createError('No pudo obtener las zonas', 500);
@@ -43,8 +43,9 @@ export const updateZone = async (req, res) => {
     try {
         const repo = new ZoneRepository();
         const { id } = req.params;
-        const updateData = req.body || {};
-        const updated = await repo.updateById(id, updateData);
+        const updateData = { ...(req.body || {}) };
+        delete updateData.companyId;
+        const updated = await repo.updateById(id, req.companyId, updateData);
         if (!updated) return res.status(404).json({ message: 'Zona no encontrada o no se pudo actualizar' });
         res.status(200).json(updated);
     } catch (error) {
@@ -57,7 +58,7 @@ export const deleteZone = async (req, res) => {
     try {
         const repo = new ZoneRepository();
         const { id } = req.params;
-        const deleted = await repo.deleteById(id);
+        const deleted = await repo.deleteById(id, req.companyId);
         if (!deleted) return res.status(404).json({ message: 'Zona no encontrada o no se pudo eliminar' });
         res.status(200).json({ message: 'Zona eliminada correctamente' });
     } catch (error) {

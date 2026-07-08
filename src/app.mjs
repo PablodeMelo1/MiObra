@@ -18,6 +18,7 @@ import groupRoutes from './routes/v1/group.mjs';
 import publicRoutes from './routes/v1/public.mjs';
 import itemRoutes from './routes/v1/item.mjs';
 import zoneRoutes from './routes/v1/zone.mjs';
+import companyRoutes from './routes/v1/company.mjs';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -54,6 +55,7 @@ app.use('/api/v1/pendings', pendingRoutes);
 app.use('/api/v1/groups', groupRoutes);
 app.use('/api/v1/items', itemRoutes);
 app.use('/api/v1/zones', zoneRoutes);
+app.use('/api/v1/companies', companyRoutes);
 
 app.use((err, req, res, next) => {
 	console.error(err);

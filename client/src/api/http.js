@@ -13,4 +13,12 @@ const api = axios.create({
   timeout: 15000,
 });
 
+api.interceptors.request.use((config) => {
+  const activeCompanyId = window.localStorage.getItem('activeCompanyId');
+  if (activeCompanyId) {
+    config.headers['X-Company-Id'] = activeCompanyId;
+  }
+  return config;
+});
+
 export default api;

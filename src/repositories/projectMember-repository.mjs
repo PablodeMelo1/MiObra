@@ -13,32 +13,35 @@ export default class ProjectMemberRepository {
         }
     }
 
-    async findByUserId(userId) {
-        return await ProjectMember.find({ userId });
+    async findByUserId(userId, companyId = null) {
+        const query = { userId };
+        if (companyId) query.companyId = companyId;
+        return await ProjectMember.find(query);
     }
 
-    async findByProjectId(projectId) {
-        return await ProjectMember.find({ projectId });
+    async findByProjectId(projectId, companyId) {
+        return await ProjectMember.find({ projectId, companyId });
     }
 
     async getByProjectId(data) {
         const projectId = typeof data === 'string' ? data : data?.projectId;
-        return await ProjectMember.find({ projectId });
+        return await ProjectMember.find({ projectId, companyId: data?.companyId });
     }
 
     async getById(data) {
         const id = typeof data === 'string' ? data : data?._id;
-        return await ProjectMember.findById(id);
+        const query = { _id: id };
+        if (data?.companyId) query.companyId = data.companyId;
+        return await ProjectMember.findOne(query);
     }
 
-    async getAll() {
-        
-        return ProjectMember.find({});
+    async getAll(companyId) {
+        return ProjectMember.find({ companyId });
     }
 
-    async deleteUserById(memberId) {
+    async deleteUserById(memberId, companyId) {
         try {
-            await ProjectMember.findByIdAndDelete(memberId);
+            return await ProjectMember.findOneAndDelete({ _id: memberId, companyId });
         } catch (err) {
             throw new Error('Error deleting project member: ' + err.message);
         }
@@ -46,16 +49,20 @@ export default class ProjectMemberRepository {
 
     async deleteById(data) {
         const id = typeof data === 'string' ? data : data?._id;
-        return await ProjectMember.findByIdAndDelete(id);
+        const query = { _id: id };
+        if (data?.companyId) query.companyId = data.companyId;
+        return await ProjectMember.findOneAndDelete(query);
     }
 
     async updateRol(data) {
-        const { _id, role } = data;
-        return ProjectMember.findOneAndUpdate({ _id }, { role }, { new: true });
+        const { _id, role, companyId } = data;
+        return ProjectMember.findOneAndUpdate({ _id, companyId }, { role }, { new: true });
     }
 
     async updateById(data, updateData = {}) {
         const id = typeof data === 'string' ? data : data?._id;
-        return await ProjectMember.findByIdAndUpdate(id, updateData, { new: true });
+        const query = { _id: id };
+        if (data?.companyId) query.companyId = data.companyId;
+        return await ProjectMember.findOneAndUpdate(query, updateData, { new: true });
     }
 }

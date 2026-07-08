@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/auth-context';
 import { getApiErrorMessage } from '../utils/apiError';
 
@@ -9,6 +9,8 @@ const inputClassName = 'w-full rounded-lg border border-white/15 bg-black/25 px-
 function RegisterPage() {
   const { signUp } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const invitationToken = searchParams.get('invitationToken') || '';
   const [serverError, setServerError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({ mode: 'onTouched' });
@@ -17,7 +19,13 @@ function RegisterPage() {
   const onSubmit = handleSubmit(async (data) => {
     try {
       setServerError('');
-      await signUp({ name: data.name.trim(), email: data.email.trim().toLowerCase(), password: data.password });
+      await signUp({
+        name: data.name.trim(),
+        email: data.email.trim().toLowerCase(),
+        password: data.password,
+        companyName: data.companyName?.trim(),
+        invitationToken: invitationToken || undefined,
+      });
       navigate('/dashboard', { replace: true });
     } catch (error) {
       setServerError(getApiErrorMessage(error, 'No se pudo crear la cuenta. Intenta nuevamente.'));
@@ -47,6 +55,26 @@ function RegisterPage() {
               {errors[field.name] && <p className="mt-1.5 text-xs text-rose-300">{errors[field.name].message}</p>}
             </div>
           ))}
+
+          {!invitationToken && (
+            <div>
+              <label htmlFor="register-company" className="mb-1.5 block text-sm text-white/75">Empresa</label>
+              <input id="register-company" type="text" autoComplete="organization" placeholder="Nombre de la empresa" aria-invalid={Boolean(errors.companyName)}
+                {...register('companyName', {
+                  required: 'Ingresa el nombre de la empresa.',
+                  minLength: { value: 2, message: 'La empresa debe tener al menos 2 caracteres.' },
+                  maxLength: { value: 80, message: 'La empresa no puede superar 80 caracteres.' },
+                  onChange: clearServerError,
+                })} className={inputClassName} />
+              {errors.companyName && <p className="mt-1.5 text-xs text-rose-300">{errors.companyName.message}</p>}
+            </div>
+          )}
+
+          {invitationToken && (
+            <div className="rounded-lg border border-cyan-300/25 bg-cyan-500/10 px-3 py-2.5 text-sm text-cyan-100">
+              Vas a crear tu cuenta dentro de la empresa que te invito.
+            </div>
+          )}
 
           <div>
             <label htmlFor="register-password" className="mb-1.5 block text-sm text-white/75">Contrasena</label>

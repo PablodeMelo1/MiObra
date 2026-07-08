@@ -2,8 +2,8 @@ import Item from '../model/item-schema.mjs';
 
 export default class itemMongoRepository {
 
-    async getById(id) {
-        return Item.findById(id);
+    async getById(id, companyId) {
+        return Item.findOne({ _id: id, companyId });
     }
 
     async getAll(filter = {}) {
@@ -22,24 +22,24 @@ export default class itemMongoRepository {
     async updateById(id, data) {
         try {
             data.updatedAt = Date.now();
-            return await Item.findByIdAndUpdate(id, data, { new: true });
+            return await Item.findOneAndUpdate({ _id: id, companyId: data.companyId }, data, { new: true });
         } catch (err) {
             throw new Error('Error updating item: ' + err.message);
         }
     }
 
-    async deleteById(id) {
+    async deleteById(data) {
         try {
-            return await Item.findByIdAndDelete(id);
+            return await Item.findOneAndDelete({ _id: data._id, companyId: data.companyId });
         } catch (err) {
             throw new Error('Error deleting item: ' + err.message);
         }
     }
 
-    async updateAvailableQuantity(id, newQuantity) {
+    async updateAvailableQuantity(id, newQuantity, companyId) {
         try {
-            return await Item.findByIdAndUpdate(
-                id,
+            return await Item.findOneAndUpdate(
+                { _id: id, companyId },
                 { availableQuantity: newQuantity, updatedAt: Date.now() },
                 { new: true }
             );
@@ -48,10 +48,10 @@ export default class itemMongoRepository {
         }
     }
 
-    async incrementAvailableQuantity(id, amount) {
+    async incrementAvailableQuantity(id, amount, companyId) {
         try {
-            return await Item.findByIdAndUpdate(
-                id,
+            return await Item.findOneAndUpdate(
+                { _id: id, companyId },
                 { $inc: { availableQuantity: amount }, updatedAt: Date.now() },
                 { new: true }
             );
@@ -60,10 +60,10 @@ export default class itemMongoRepository {
         }
     }
 
-    async decrementAvailableQuantity(id, amount) {
+    async decrementAvailableQuantity(id, amount, companyId) {
         try {
-            return await Item.findByIdAndUpdate(
-                id,
+            return await Item.findOneAndUpdate(
+                { _id: id, companyId },
                 { $inc: { availableQuantity: -Math.abs(amount) }, updatedAt: Date.now() },
                 { new: true }
             );
@@ -72,11 +72,11 @@ export default class itemMongoRepository {
         }
     }
 
-    async incrementStock(id, amount) {
+    async incrementStock(id, amount, companyId) {
         try {
             const value = Math.abs(Number(amount) || 0);
-            return await Item.findByIdAndUpdate(
-                id,
+            return await Item.findOneAndUpdate(
+                { _id: id, companyId },
                 {
                     $inc: { totalQuantity: value, availableQuantity: value },
                     updatedAt: Date.now(),

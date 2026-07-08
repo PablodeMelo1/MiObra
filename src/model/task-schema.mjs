@@ -7,6 +7,7 @@ const STATUS = Object.values(TASK_STATUS);
 const PRIORITY = Object.values(TASK_PRIORITY);
 
 const taskSchema = new mongoose.Schema({
+  companyId: { type: ObjectId, ref: 'Company', required: true, index: true },
   projectId: { type: ObjectId, ref: 'Project', required: true },
   title: { type: String, required: true, trim: true },
   description: { type: String, default: '' },
@@ -17,5 +18,7 @@ const taskSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   dueDate: { type: Date }
 }, { timestamps: true });
+
+taskSchema.index({ companyId: 1, projectId: 1, list: 1 });
 
 export default mongoose.model('Task', taskSchema);

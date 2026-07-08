@@ -6,6 +6,10 @@ export default class UserMongoRepository {
         return User.find({});
     }
 
+    async getAllByIds(ids = []) {
+        return User.find({ _id: { $in: ids } });
+    }
+
     async getById(id) {
         return User.findById(id);
     }
@@ -15,8 +19,12 @@ export default class UserMongoRepository {
     async getByName(name) {
         return User.find({ name });
     }
-    async createOne(data) {
+    async createOne(data, session = null) {
         try {
+            if (session) {
+                const [userSave] = await User.create([data], { session });
+                return userSave;
+            }
             const newUser = new User(data);
             const userSave = await newUser.save();
             return userSave;
@@ -41,7 +49,7 @@ export default class UserMongoRepository {
     }
 
     async getByEmail(email) {
-        return User.findOne({ email });
+        return User.findOne({ email: String(email).toLowerCase() });
     }
 
 }
