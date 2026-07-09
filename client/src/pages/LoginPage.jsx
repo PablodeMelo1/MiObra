@@ -7,10 +7,12 @@ import { getApiErrorMessage } from '../utils/apiError';
 const inputClassName = 'w-full rounded-lg border border-white/15 bg-black/25 px-3 py-2.5 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-500/20';
 
 function LoginPage() {
-  const { signIn } = useAuth();
+  const { signIn, resendEmailVerification } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [serverError, setServerError] = useState('');
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+  const [resendMessage, setResendMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({ mode: 'onTouched' });
 
@@ -18,18 +20,35 @@ function LoginPage() {
   const onSubmit = handleSubmit(async (data) => {
     try {
       setServerError('');
+      setUnverifiedEmail('');
+      setResendMessage('');
       await signIn({ email: data.email.trim().toLowerCase(), password: data.password });
       navigate(location.state?.from?.pathname || '/dashboard', { replace: true });
     } catch (error) {
+      if (error?.response?.data?.code === 'EMAIL_NOT_VERIFIED') {
+        setUnverifiedEmail(error.response.data.email || data.email.trim().toLowerCase());
+      }
       setServerError(getApiErrorMessage(error, 'No se pudo iniciar sesion. Verifica tus credenciales.'));
     }
   });
+
+  const handleResend = async () => {
+    if (!unverifiedEmail) return;
+    try {
+      setServerError('');
+      setResendMessage('');
+      await resendEmailVerification(unverifiedEmail);
+      setResendMessage('Enviamos un nuevo email de verificacion.');
+    } catch (error) {
+      setServerError(getApiErrorMessage(error, 'No se pudo reenviar la verificacion.'));
+    }
+  };
 
   return (
     <main className="grid min-h-screen bg-[#0c0f14] px-4 py-8 text-white sm:place-items-center">
       <section className="mx-auto w-full max-w-md self-center rounded-2xl border border-white/10 bg-[#111723] p-5 shadow-2xl sm:p-8">
         <div className="mb-6 text-center">
-          <p className="text-sm font-semibold tracking-[0.22em] text-cyan-200">SCANDIA</p>
+          <p className="text-sm font-semibold tracking-[0.22em] text-cyan-200">MIOBRA</p>
           <h1 className="mt-2 text-2xl font-semibold">Iniciar sesion</h1>
           <p className="mt-2 text-sm text-white/55">Ingresa para gestionar tus obras y operaciones.</p>
         </div>
@@ -60,6 +79,14 @@ function LoginPage() {
           </div>
 
           {serverError && <div role="alert" className="flex gap-2 rounded-lg border border-rose-300/25 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-100"><i className="fa-solid fa-circle-exclamation mt-0.5" aria-hidden="true" /><span>{serverError}</span></div>}
+
+          {unverifiedEmail && (
+            <div className="rounded-lg border border-cyan-300/25 bg-cyan-500/10 px-3 py-3 text-sm text-cyan-50">
+              <p>La cuenta {unverifiedEmail} todavia no esta verificada.</p>
+              {resendMessage && <p className="mt-1 text-cyan-100">{resendMessage}</p>}
+              <button type="button" onClick={handleResend} className="mt-3 rounded-lg border border-cyan-200/30 px-3 py-2 text-xs font-semibold text-cyan-50 transition hover:bg-cyan-200/10">Reenviar verificacion</button>
+            </div>
+          )}
 
           <button type="submit" disabled={isSubmitting}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-300 px-4 py-2.5 text-sm font-semibold text-[#071017] transition hover:bg-cyan-200 disabled:cursor-wait disabled:opacity-60">

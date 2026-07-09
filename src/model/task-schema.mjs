@@ -12,6 +12,9 @@ const taskSchema = new mongoose.Schema({
   title: { type: String, required: true, trim: true },
   description: { type: String, default: '' },
   assignedTo: { type: ObjectId, ref: 'User' },
+  assignedEmployeeIds: [{ type: ObjectId, ref: 'Employee' }],
+  createdByUserId: { type: ObjectId, ref: 'User' },
+  updatedByUserId: { type: ObjectId, ref: 'User', default: null },
   status: { type: String, enum: STATUS, default: TASK_STATUS.PENDING },
   priority: { type: String, enum: PRIORITY, default: TASK_PRIORITY.MEDIUM },
   list: { type: String, required: true, default: 'Tareas Pendientes' },
@@ -20,5 +23,6 @@ const taskSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 taskSchema.index({ companyId: 1, projectId: 1, list: 1 });
+taskSchema.index({ companyId: 1, assignedEmployeeIds: 1 });
 
 export default mongoose.model('Task', taskSchema);

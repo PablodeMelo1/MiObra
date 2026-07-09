@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import ProjectBoard from './pages/ProjectBoard';
@@ -13,7 +14,9 @@ import InventoryItemDetails from './pages/InventoryItemDetails';
 import InventoryHistory from './pages/InventoryHistory';
 import Calendar from './pages/Calendar';
 import Settings from './pages/Settings';
+import Employees from './pages/Employees';
 import NotFound from './pages/NotFound';
+import AcceptEmployeeInvitationPage from './pages/AcceptEmployeeInvitationPage';
 import ProtectedRoute from './components/routing/ProtectedRoute';
 import PublicRoute from './components/routing/PublicRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -28,6 +31,9 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
           </Route>
 
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/employee-invitations/accept" element={<AcceptEmployeeInvitationPage />} />
+
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
@@ -35,6 +41,7 @@ function App() {
             <Route path="/projects" element={<Projects />} />
             <Route path="/projects/:id" element={<ProjectBoard />} />
             <Route path="/suppliers" element={<Suppliers />} />
+            <Route path="/employees" element={<Employees />} />
             <Route path="/material-requests" element={<MaterialRequests />} />
             <Route path="/inventory" element={<Inventory />} />
             <Route path="/inventory/history" element={<InventoryHistory />} />

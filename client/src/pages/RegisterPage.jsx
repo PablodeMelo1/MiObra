@@ -7,11 +7,14 @@ import { getApiErrorMessage } from '../utils/apiError';
 const inputClassName = 'w-full rounded-lg border border-white/15 bg-black/25 px-3 py-2.5 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-500/20';
 
 function RegisterPage() {
-  const { signUp } = useAuth();
+  const { signUp, resendEmailVerification } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const invitationToken = searchParams.get('invitationToken') || '';
+  const employeeInvitationToken = searchParams.get('employeeInvitationToken') || '';
   const [serverError, setServerError] = useState('');
+  const [pendingVerification, setPendingVerification] = useState(null);
+  const [resendMessage, setResendMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({ mode: 'onTouched' });
   const clearServerError = () => setServerError('');
@@ -19,18 +22,33 @@ function RegisterPage() {
   const onSubmit = handleSubmit(async (data) => {
     try {
       setServerError('');
-      await signUp({
+      const response = await signUp({
         name: data.name.trim(),
         email: data.email.trim().toLowerCase(),
         password: data.password,
         companyName: data.companyName?.trim(),
         invitationToken: invitationToken || undefined,
+        employeeInvitationToken: employeeInvitationToken || undefined,
       });
-      navigate('/dashboard', { replace: true });
+      setPendingVerification(response.data);
+      setResendMessage('');
     } catch (error) {
       setServerError(getApiErrorMessage(error, 'No se pudo crear la cuenta. Intenta nuevamente.'));
     }
   });
+
+  const handleResend = async () => {
+    if (!pendingVerification?.email) return;
+    try {
+      setServerError('');
+      setResendMessage('');
+      const response = await resendEmailVerification(pendingVerification.email);
+      setPendingVerification((current) => ({ ...current, ...response.data }));
+      setResendMessage('Enviamos un nuevo email de verificacion.');
+    } catch (error) {
+      setServerError(getApiErrorMessage(error, 'No se pudo reenviar la verificacion.'));
+    }
+  };
 
   const fields = [
     { id: 'register-name', name: 'name', label: 'Nombre', type: 'text', autoComplete: 'name', placeholder: 'Tu nombre', rules: { required: 'Ingresa tu nombre.', minLength: { value: 3, message: 'El nombre debe tener al menos 3 caracteres.' }, maxLength: { value: 40, message: 'El nombre no puede superar 40 caracteres.' } } },
@@ -41,11 +59,28 @@ function RegisterPage() {
     <main className="grid min-h-screen bg-[#0c0f14] px-4 py-8 text-white sm:place-items-center">
       <section className="mx-auto w-full max-w-md self-center rounded-2xl border border-white/10 bg-[#111723] p-5 shadow-2xl sm:p-8">
         <div className="mb-6 text-center">
-          <p className="text-sm font-semibold tracking-[0.22em] text-cyan-200">SCANDIA</p>
+          <p className="text-sm font-semibold tracking-[0.22em] text-cyan-200">MIOBRA</p>
           <h1 className="mt-2 text-2xl font-semibold">Crear cuenta</h1>
           <p className="mt-2 text-sm text-white/55">Completa tus datos para comenzar.</p>
         </div>
 
+        {pendingVerification ? (
+          <div className="space-y-4">
+            <div className="rounded-lg border border-emerald-300/25 bg-emerald-500/10 px-3 py-3 text-sm text-emerald-50">
+              <p className="font-medium">Cuenta creada pendiente de verificacion.</p>
+              <p className="mt-1 text-emerald-50/75">Te enviamos un link a {pendingVerification.email}. Verifica tu email para iniciar sesion.</p>
+              {pendingVerification.devVerificationUrl && (
+                <a className="mt-2 block break-all text-cyan-100 hover:underline" href={pendingVerification.devVerificationUrl}>Abrir link de verificacion local</a>
+              )}
+            </div>
+            {resendMessage && <p className="text-sm text-cyan-100">{resendMessage}</p>}
+            {serverError && <div role="alert" className="flex gap-2 rounded-lg border border-rose-300/25 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-100"><i className="fa-solid fa-circle-exclamation mt-0.5" aria-hidden="true" /><span>{serverError}</span></div>}
+            <div className="grid gap-2 sm:grid-cols-2">
+              <button type="button" onClick={handleResend} className="rounded-lg border border-white/15 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10">Reenviar email</button>
+              <button type="button" onClick={() => navigate('/login', { replace: true })} className="rounded-lg bg-cyan-300 px-4 py-2.5 text-sm font-semibold text-[#071017] transition hover:bg-cyan-200">Ir a login</button>
+            </div>
+          </div>
+        ) : (
         <form onSubmit={onSubmit} noValidate className="space-y-4">
           {fields.map((field) => (
             <div key={field.name}>
@@ -56,7 +91,7 @@ function RegisterPage() {
             </div>
           ))}
 
-          {!invitationToken && (
+          {!invitationToken && !employeeInvitationToken && (
             <div>
               <label htmlFor="register-company" className="mb-1.5 block text-sm text-white/75">Empresa</label>
               <input id="register-company" type="text" autoComplete="organization" placeholder="Nombre de la empresa" aria-invalid={Boolean(errors.companyName)}
@@ -73,6 +108,12 @@ function RegisterPage() {
           {invitationToken && (
             <div className="rounded-lg border border-cyan-300/25 bg-cyan-500/10 px-3 py-2.5 text-sm text-cyan-100">
               Vas a crear tu cuenta dentro de la empresa que te invito.
+            </div>
+          )}
+
+          {employeeInvitationToken && (
+            <div className="rounded-lg border border-cyan-300/25 bg-cyan-500/10 px-3 py-2.5 text-sm text-cyan-100">
+              Vas a crear tu cuenta y vincularla con tu ficha de empleado.
             </div>
           )}
 
@@ -95,8 +136,9 @@ function RegisterPage() {
             {isSubmitting ? 'Creando cuenta...' : 'Crear cuenta'}
           </button>
         </form>
+        )}
 
-        <p className="mt-5 text-center text-sm text-white/55">Ya tienes una cuenta? <Link to="/login" className="font-medium text-cyan-200 hover:text-cyan-100">Inicia sesion</Link></p>
+        {!pendingVerification && <p className="mt-5 text-center text-sm text-white/55">Ya tienes una cuenta? <Link to="/login" className="font-medium text-cyan-200 hover:text-cyan-100">Inicia sesion</Link></p>}
       </section>
     </main>
   );

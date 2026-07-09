@@ -19,6 +19,7 @@ import publicRoutes from './routes/v1/public.mjs';
 import itemRoutes from './routes/v1/item.mjs';
 import zoneRoutes from './routes/v1/zone.mjs';
 import companyRoutes from './routes/v1/company.mjs';
+import employeeRoutes from './routes/v1/employee.mjs';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -56,6 +57,7 @@ app.use('/api/v1/groups', groupRoutes);
 app.use('/api/v1/items', itemRoutes);
 app.use('/api/v1/zones', zoneRoutes);
 app.use('/api/v1/companies', companyRoutes);
+app.use('/api/v1/employees', employeeRoutes);
 
 app.use((err, req, res, next) => {
 	console.error(err);

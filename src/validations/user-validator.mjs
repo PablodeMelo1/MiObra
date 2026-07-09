@@ -22,9 +22,14 @@ export const validateSingup = Joi.object({
     companyName: Joi.string().min(2).max(80).when('invitationToken', {
         is: Joi.exist(),
         then: Joi.optional(),
-        otherwise: Joi.required(),
+        otherwise: Joi.when('employeeInvitationToken', {
+            is: Joi.exist(),
+            then: Joi.optional(),
+            otherwise: Joi.required(),
+        }),
     }),
     invitationToken: Joi.string().min(20).max(200).optional(),
+    employeeInvitationToken: Joi.string().min(20).max(200).optional(),
     profileImage: Joi.string().uri().optional(),
     profileImagePublicId: Joi.string().optional()
 }).messages({
@@ -44,5 +49,22 @@ export const validateLogin = Joi.object({
     'string.empty': 'El campo {#label} es obligatorio',
     'string.min': 'El campo {#label} debe tener al menos {#limit} caracteres',
     'string.max': 'El campo {#label} no puede superar {#limit} caracteres',
+    'string.pattern.base': 'El email ingresado no es valido',
+});
+
+export const validateEmailVerificationConfirm = Joi.object({
+    token: Joi.string().min(32).max(200).required(),
+}).messages({
+    'any.required': 'El campo {#label} es obligatorio',
+    'string.empty': 'El campo {#label} es obligatorio',
+    'string.min': 'El token de verificacion no es valido',
+    'string.max': 'El token de verificacion no es valido',
+});
+
+export const validateEmailVerificationResend = Joi.object({
+    email: Joi.string().regex(/.+@.+\..+/).required(),
+}).messages({
+    'any.required': 'El campo {#label} es obligatorio',
+    'string.empty': 'El campo {#label} es obligatorio',
     'string.pattern.base': 'El email ingresado no es valido',
 });

@@ -52,4 +52,8 @@ export default class UserMongoRepository {
         return User.findOne({ email: String(email).toLowerCase() });
     }
 
+    async getByEmailVerificationTokenHash(tokenHash) {
+        return User.findOne({ emailVerificationTokenHash: tokenHash });
+    }
+
 }

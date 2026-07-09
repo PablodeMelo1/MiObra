@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import "dotenv/config";
 import { validateAuth } from "../validations/user-validator.mjs";
 import { loadCompanyContext } from "./company-context-middleware.mjs";
+import UserRepository from "../repositories/user-repository.mjs";
 
 const { PASS_JWT } = process.env;
 
@@ -42,4 +43,28 @@ export const authMiddleware = (req, res, next) => {
     }
 }
 
-export const auth = [authMiddleware, loadCompanyContext()];
+export const requireVerifiedEmail = async (req, res, next) => {
+    try {
+        const userRepo = new UserRepository();
+        const user = await userRepo.getById(req.user?.id);
+
+        if (!user) {
+            return res.status(401).json({ message: "No se pudo autenticar" });
+        }
+
+        if (user.emailVerificationStatus && user.emailVerificationStatus !== 'verified') {
+            return res.status(403).json({
+                message: 'Debes verificar tu email para continuar',
+                code: 'EMAIL_NOT_VERIFIED',
+                email: user.email,
+                emailVerificationStatus: user.emailVerificationStatus,
+            });
+        }
+
+        next();
+    } catch (error) {
+        res.status(500).json({ message: "No pudo validar el estado de verificacion" });
+    }
+};
+
+export const auth = [authMiddleware, requireVerifiedEmail, loadCompanyContext()];

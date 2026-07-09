@@ -7,6 +7,7 @@ const mainItems = [
   { id: 'projects', label: 'Proyectos', path: '/projects', icon: 'fa-solid fa-list-check' },
   { id: 'calendar', label: 'Calendario', path: '/calendar', icon: 'fa-regular fa-calendar-days' },
   { id: 'pendings', label: 'Pendientes', path: '/pendings', icon: 'fa-regular fa-clock' },
+  { id: 'employees', label: 'Empleados', path: '/employees', icon: 'fa-solid fa-users-gear' },
   { id: 'inventory', label: 'Inventario', path: '/inventory', icon: 'fa-solid fa-screwdriver-wrench' },
   { id: 'inventory-history', label: 'Historial inventario', path: '/inventory/history', icon: 'fa-solid fa-timeline' },
   { id: 'material-requests', label: 'Peticiones de materiales', path: '/material-requests', icon: 'fa-regular fa-calendar' },
@@ -72,7 +73,7 @@ function Sidebar() {
           className="grid h-10 w-10 place-items-center rounded-lg border border-white/15 bg-white/5 text-white">
           <i className="fa-solid fa-bars" aria-hidden="true" />
         </button>
-        <span className="ml-3 text-base font-semibold tracking-wide">Scandia</span>
+        <span className="ml-3 text-base font-semibold tracking-wide">Miobra</span>
       </div>
 
       <button type="button" aria-label="Cerrar menu principal" onClick={() => setIsOpen(false)}
@@ -81,7 +82,7 @@ function Sidebar() {
       <aside id="main-navigation"
         className={`fixed inset-y-0 left-0 z-50 flex w-[min(86vw,20rem)] flex-col overflow-y-auto border-r border-white/10 bg-linear-to-b from-[#1d222d] via-[#151922] to-[#0f131b] p-4 text-white shadow-2xl transition-transform duration-300 lg:sticky lg:top-5 lg:z-auto lg:h-[calc(100vh-2.5rem)] lg:w-75 lg:shrink-0 lg:translate-x-0 lg:rounded-2xl lg:border ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-4">
-          <h1 className="text-2xl font-semibold tracking-wide">Scandia</h1>
+          <h1 className="text-2xl font-semibold tracking-wide">Miobra</h1>
           <button type="button" onClick={() => setIsOpen(false)} aria-label="Cerrar menu principal"
             className="grid h-9 w-9 place-items-center rounded-lg border border-white/15 text-white/75 lg:hidden">
             <i className="fa-solid fa-xmark" aria-hidden="true" />
