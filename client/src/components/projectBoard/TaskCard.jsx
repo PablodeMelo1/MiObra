@@ -37,7 +37,7 @@ function TaskCard({ task, onDragStart, onEdit, onDelete, assignedLabel }) {
         </span>
         <span className="rounded border border-white/10 px-1.5 py-0.5">{task.priority || 'MEDIUM'}</span>
         <span className="sm:col-span-2 truncate rounded border border-white/10 px-1.5 py-0.5">
-          {task.assignedTo ? `Asignado: ${assignedLabel}` : 'Sin asignar'}
+          {assignedLabel ? `Asignado: ${assignedLabel}` : 'Sin asignar'}
         </span>
         <span className="sm:col-span-2 rounded border border-white/10 px-1.5 py-0.5">
           {task.dueDate ? `Vence: ${toInputDate(task.dueDate)}` : 'Sin fecha limite'}

@@ -5,7 +5,7 @@ function TaskModal({
   isOpen,
   mode,
   form,
-  users,
+  employees,
   lists,
   onClose,
   onChange,
@@ -92,20 +92,21 @@ function TaskModal({
                 </select>
               </label>
 
-              <label className="space-y-1">
-                <span className="text-white/70">Asignado a</span>
+              <label className="space-y-1 sm:col-span-2">
+                <span className="text-white/70">Empleados asignados</span>
                 <select
-                  value={form.assignedTo}
-                  onChange={(event) => onChange('assignedTo', event.target.value)}
+                  multiple
+                  value={form.assignedEmployeeIds}
+                  onChange={(event) => onChange('assignedEmployeeIds', Array.from(event.target.selectedOptions).map((option) => option.value))}
                   className="w-full rounded border border-white/15 bg-[#0d1119] px-2 py-1.5 text-white outline-none focus:border-white/30"
                 >
-                  <option value="">Sin asignar</option>
-                  {users.map((user) => (
-                    <option key={user._id || user.id} value={user._id || user.id}>
-                      {user.name || user.email || 'Usuario sin nombre'}
+                  {employees.map((employee) => (
+                    <option key={employee._id || employee.id} value={employee._id || employee.id}>
+                      {employee.fullName || employee.workEmail || 'Empleado sin nombre'}
                     </option>
                   ))}
                 </select>
+                <span className="block text-[10px] text-white/45">Usa Ctrl o Cmd para seleccionar mas de uno.</span>
               </label>
 
               <label className="space-y-1">

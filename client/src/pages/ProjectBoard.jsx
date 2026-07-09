@@ -11,6 +11,7 @@ import {
   updateTask,
 } from '../api/tasks';
 import { getUsers } from '../api/user';
+import { getEmployees } from '../api/employees';
 import { createProjectMember, getProjectMembers } from '../api/projectMembers';
 import { useAuth } from '../context/auth-context';
 import BoardHeader from '../components/projectBoard/BoardHeader';
@@ -34,6 +35,7 @@ function ProjectBoard() {
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [projectMembers, setProjectMembers] = useState([]);
   const [materialRequests, setMaterialRequests] = useState([]);
   const [items, setItems] = useState([]);
@@ -78,6 +80,7 @@ function ProjectBoard() {
     title: '',
     description: '',
     assignedTo: '',
+    assignedEmployeeIds: [],
     status: 'PENDING',
     priority: 'MEDIUM',
     list: '',
@@ -100,6 +103,20 @@ function ProjectBoard() {
     const normalized = typeof userId === 'string' ? userId : userId?._id;
     const user = users.find((candidate) => (candidate._id || candidate.id) === normalized);
     return user?.name || user?.email || normalized || 'Usuario';
+  };
+
+  const getAssignedLabel = (task) => {
+    const assignedEmployees = Array.isArray(task.assignedEmployeeIds) ? task.assignedEmployeeIds : [];
+    if (assignedEmployees.length > 0) {
+      return assignedEmployees.map((employee) => {
+        if (typeof employee === 'string') {
+          const match = employees.find((candidate) => String(candidate._id || candidate.id) === String(employee));
+          return match?.fullName || employee;
+        }
+        return employee.fullName || employee.workEmail || 'Empleado';
+      }).join(', ');
+    }
+    return task.assignedTo ? userNameById(task.assignedTo?._id || task.assignedTo) : '';
   };
 
   const normalizedMemberUserIds = useMemo(
@@ -145,6 +162,7 @@ function ProjectBoard() {
           projectResponse,
           tasksResponse,
           usersResponse,
+          employeesResponse,
           membersResponse,
           requestsResponse,
           itemsResponse,
@@ -153,6 +171,7 @@ function ProjectBoard() {
           getProjectById(projectId),
           getTasksByProjectId(projectId),
           getUsers(),
+          getEmployees(),
           getProjectMembers(projectId),
           getMaterialRequests(),
           getItems(),
@@ -162,6 +181,7 @@ function ProjectBoard() {
         setProject(projectResponse.data?.project || null);
         setTasks(tasksResponse.data?.tareas || []);
         setUsers(usersResponse.data || []);
+        setEmployees(employeesResponse.data?.employees || []);
         setProjectMembers(membersResponse.data?.members || []);
         setMaterialRequests(requestsResponse.data?.materialRequests || []);
         setItems(itemsResponse.data || []);
@@ -500,6 +520,7 @@ function ProjectBoard() {
       title: '',
       description: '',
       assignedTo: '',
+      assignedEmployeeIds: [],
       status: 'PENDING',
       priority: 'MEDIUM',
       list: listName,
@@ -514,6 +535,9 @@ function ProjectBoard() {
       title: task.title || '',
       description: task.description || '',
       assignedTo: task.assignedTo?._id || task.assignedTo || '',
+      assignedEmployeeIds: Array.isArray(task.assignedEmployeeIds)
+        ? task.assignedEmployeeIds.map((employee) => employee._id || employee.id || employee)
+        : [],
       status: task.status || 'PENDING',
       priority: task.priority || 'MEDIUM',
       list: task.list || lists[0] || 'Tareas pendientes',
@@ -561,6 +585,7 @@ function ProjectBoard() {
       title: cleanTitle,
       description: cleanDescription,
       assignedTo: taskForm.assignedTo || null,
+      assignedEmployeeIds: taskForm.assignedEmployeeIds || [],
       status: taskForm.status,
       priority: taskForm.priority,
       list: taskForm.list,
@@ -649,7 +674,7 @@ function ProjectBoard() {
                   onTaskDragStart={handleTaskDragStart}
                   onEditTask={openEditTaskModal}
                   onDeleteTask={openDeleteTaskModal}
-                  getAssignedLabel={userNameById}
+                  getAssignedLabel={getAssignedLabel}
                 />
               ))}
             </div>
@@ -661,7 +686,7 @@ function ProjectBoard() {
         isOpen={taskModal.isOpen}
         mode={taskModal.mode}
         form={taskForm}
-        users={users}
+        employees={employees}
         lists={lists}
         onClose={closeTaskModal}
         onChange={handleTaskFormChange}

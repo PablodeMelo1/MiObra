@@ -2,12 +2,32 @@ import { createError } from "../error/create-error.mjs";
 import taskMongoRepository from "../repositories/task-repository.mjs";
 import projectMongoRepository from "../repositories/project-repository.mjs";
 import CompanyMemberRepository from "../repositories/companyMember-repository.mjs";
+import EmployeeRepository from "../repositories/employee-repository.mjs";
 
 const isUserInCompany = async (userId, companyId) => {
     if (!userId) return true;
     const memberRepo = new CompanyMemberRepository();
     const memberIds = await memberRepo.findActiveUserIdsByCompanyId(companyId);
     return memberIds.some((memberId) => String(memberId) === String(userId));
+};
+
+const normalizeEmployeeIds = (employeeIds) => (
+    Array.isArray(employeeIds)
+        ? [...new Set(employeeIds.filter(Boolean).map((id) => String(id)))]
+        : []
+);
+
+const areEmployeesInCompany = async (employeeIds = [], companyId) => {
+    if (!employeeIds.length) return true;
+    const employeeRepo = new EmployeeRepository();
+    const employees = await Promise.all(employeeIds.map((id) => employeeRepo.getByIdForCompany(id, companyId)));
+    return employees.every(Boolean);
+};
+
+const getLinkedEmployeeIdsForUser = async (userId, companyId) => {
+    const employeeRepo = new EmployeeRepository();
+    const employee = await employeeRepo.getByUserIdForCompany(userId, companyId);
+    return employee ? [employee._id] : [];
 };
 
 export const createTask = async (req, res) => {
@@ -36,11 +56,23 @@ export const createTask = async (req, res) => {
         if (!project.lists.includes(list)) {
             return res.status(400).json({ message: `La lista '${list}' no existe en este proyecto` });
         }
+        const assignedEmployeeIds = normalizeEmployeeIds(taskData.assignedEmployeeIds);
+        if (!(await areEmployeesInCompany(assignedEmployeeIds, companyId))) {
+            return res.status(403).json({ message: "Uno o mas empleados asignados no pertenecen a la empresa activa" });
+        }
         if (!(await isUserInCompany(taskData.assignedTo, companyId))) {
             return res.status(403).json({ message: "El usuario asignado no pertenece a la empresa activa" });
         }
 
-        const newTask = { ...taskData, projectId, list, companyId };
+        const newTask = {
+            ...taskData,
+            assignedEmployeeIds,
+            projectId,
+            list,
+            companyId,
+            createdByUserId: req.user.id,
+            updatedByUserId: req.user.id,
+        };
 
         const createdTask = await taskRepository.createOne(newTask);
         if (!createdTask) {
@@ -132,7 +164,8 @@ export const getTasksByUser = async (req, res) => {
             return res.status(400).json({ message: "ProjectId es requerido" });
         }
 
-        const userTasks = await taskRepository.getByUserAndProject({ userId, project: projectId, companyId: req.companyId });
+        const employeeIds = await getLinkedEmployeeIdsForUser(userId, req.companyId);
+        const userTasks = await taskRepository.getByUserAndProject({ userId, employeeIds, project: projectId, companyId: req.companyId });
         res.status(200).json({ tareas: userTasks });
     } catch (error) {
         throw createError("No pudo obtener las tareas", 500);
@@ -186,8 +219,14 @@ export const updateTask = async (req, res) => {
         delete updateData.projectId;
         delete updateData.createdAt;
         delete updateData.updatedAt;
-        const taskUpdates = { ...updateData };
+        const taskUpdates = { ...updateData, updatedByUserId: req.user.id };
         if (list) taskUpdates.list = list;
+        if (Object.hasOwn(taskUpdates, 'assignedEmployeeIds')) {
+            taskUpdates.assignedEmployeeIds = normalizeEmployeeIds(taskUpdates.assignedEmployeeIds);
+            if (!(await areEmployeesInCompany(taskUpdates.assignedEmployeeIds, req.companyId))) {
+                return res.status(403).json({ message: "Uno o mas empleados asignados no pertenecen a la empresa activa" });
+            }
+        }
         if (!(await isUserInCompany(taskUpdates.assignedTo, req.companyId))) {
             return res.status(403).json({ message: "El usuario asignado no pertenece a la empresa activa" });
         }
@@ -273,20 +312,29 @@ export const updateAssignedTo = async (req, res) => {
     try {
         const taskRepository = new taskMongoRepository();
         const { id } = req.params;
-        const { assignedTo } = req.body;
-        if (!assignedTo) {
-            return res.status(400).json({ message: "AssignedTo es requerido" });
+        const { assignedTo = null } = req.body;
+        const assignedEmployeeIds = normalizeEmployeeIds(req.body.assignedEmployeeIds);
+        if (!assignedTo && assignedEmployeeIds.length === 0) {
+            return res.status(400).json({ message: "Debe indicar assignedEmployeeIds o assignedTo" });
+        }
+        if (!(await areEmployeesInCompany(assignedEmployeeIds, req.companyId))) {
+            return res.status(403).json({ message: "Uno o mas empleados asignados no pertenecen a la empresa activa" });
         }
         if (!(await isUserInCompany(assignedTo, req.companyId))) {
             return res.status(403).json({ message: "El usuario asignado no pertenece a la empresa activa" });
         }
-        const updatedTask = await taskRepository.updateAssigned({ _id: id, assignedTo, companyId: req.companyId });
+        const updatedTask = await taskRepository.updateAssigned({
+            _id: id,
+            assignedTo,
+            assignedEmployeeIds,
+            updatedByUserId: req.user.id,
+            companyId: req.companyId,
+        });
         res.status(200).json({ tarea: updatedTask });
     } catch (error) {
         throw createError("No pudo actualizar el assignedTo de la tarea", 500);
     }
 }
-
 
 
 

@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react';
-import { registerRequest, loginRequest, verifySessionRequest, logoutRequest, switchActiveCompanyRequest } from '../api/auth';
+import {
+    confirmEmailVerificationRequest,
+    acceptEmployeeInvitationRequest,
+    loginRequest,
+    registerRequest,
+    resendEmailVerificationRequest,
+    logoutRequest,
+    switchActiveCompanyRequest,
+    verifySessionRequest,
+} from '../api/auth';
 import { AuthContext } from './auth-context';
 
 const resolveUser = (payload) => payload?.user ?? payload;
@@ -67,9 +76,14 @@ export const AuthProvider = ({children}) => {
     
     const signUp = async (user) => {
         const response = await registerRequest(user);
-        applyAuthPayload(response.data);
         return response;
     };
+
+    const confirmEmailVerification = async (token) => confirmEmailVerificationRequest(token);
+
+    const resendEmailVerification = async (email) => resendEmailVerificationRequest(email);
+
+    const acceptEmployeeInvitation = async (token) => acceptEmployeeInvitationRequest(token);
 
     const signIn = async (user) => {
         try {
@@ -97,7 +111,21 @@ export const AuthProvider = ({children}) => {
     };
 
     return (
-        <AuthContext.Provider value={{signUp, signIn, signOut, switchCompany, user, companies, activeCompany, companyRole, isAuthenticated, isLoading}}>
+        <AuthContext.Provider value={{
+            signUp,
+            signIn,
+            signOut,
+            switchCompany,
+            confirmEmailVerification,
+            resendEmailVerification,
+            acceptEmployeeInvitation,
+            user,
+            companies,
+            activeCompany,
+            companyRole,
+            isAuthenticated,
+            isLoading,
+        }}>
             {children}
         </AuthContext.Provider>
     );

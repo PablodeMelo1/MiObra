@@ -80,7 +80,7 @@ function BoardColumn({
             onDragStart={onTaskDragStart}
             onEdit={onEditTask}
             onDelete={onDeleteTask}
-            assignedLabel={task.assignedTo ? getAssignedLabel(task.assignedTo?._id || task.assignedTo) : ''}
+            assignedLabel={getAssignedLabel(task)}
           />
         ))}
 

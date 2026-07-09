@@ -1,9 +1,9 @@
 {
   "info": {
-    "_postman_id": "scandia-api-collection",
-    "name": "Scandia API - Collection",
+    "_postman_id": "miobra-api-collection",
+    "name": "Miobra API - Collection",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Colección para probar los endpoints de Scandia (auto-generada). Use la variable {{base_url}} para apuntar al servidor (por defecto http://localhost:3000)."
+    "description": "Colección para probar los endpoints de Miobra (auto-generada). Use la variable {{base_url}} para apuntar al servidor (por defecto http://localhost:3000)."
   },
   "item": [
     {
@@ -46,6 +46,61 @@
           }
         },
         {
+          "name": "Login blocked before email verification",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"secret\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","auth","login"]
+            },
+            "description": "Debe responder 403 EMAIL_NOT_VERIFIED hasta confirmar el email."
+          }
+        },
+        {
+          "name": "Confirm Email Verification",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{emailVerificationToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/email-verification/confirm",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","auth","email-verification","confirm"]
+            }
+          }
+        },
+        {
+          "name": "Resend Email Verification",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/email-verification/resend",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","auth","email-verification","resend"]
+            }
+          }
+        },
+        {
           "name": "Me",
           "request": {
             "method": "GET",
@@ -71,6 +126,20 @@
               "raw": "{{base_url}}/api/v1/auth/company-invitations/{{companyInvitationToken}}/accept",
               "host": ["{{base_url}}"],
               "path": ["api","v1","auth","company-invitations","{{companyInvitationToken}}","accept"]
+            }
+          }
+        },
+        {
+          "name": "Accept Employee Invitation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/employee-invitations/{{employeeInvitationToken}}/accept",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","auth","employee-invitations","{{employeeInvitationToken}}","accept"]
             }
           }
         }
@@ -217,6 +286,83 @@
       ]
     },
     {
+      "name": "Employees",
+      "item": [
+        {
+          "name": "Create Employee",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"Juan Operario\",\n  \"documentType\": \"CI\",\n  \"documentNumber\": \"12345678\",\n  \"position\": \"Capataz\",\n  \"department\": \"Obra\",\n  \"phone\": \"+59899123456\",\n  \"workEmail\": \"juan.operario@example.com\",\n  \"status\": \"active\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/employees", "host": ["{{base_url}}"], "path": ["api","v1","employees"] }
+          }
+        },
+        {
+          "name": "List Employees",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/employees", "host": ["{{base_url}}"], "path": ["api","v1","employees"] }
+          }
+        },
+        {
+          "name": "Update Employee",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"position\": \"Encargado de obra\",\n  \"status\": \"active\",\n  \"userId\": \"{{userId}}\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/employees/{{employeeId}}", "host": ["{{base_url}}"], "path": ["api","v1","employees","{{employeeId}}"] }
+          }
+        },
+        {
+          "name": "Invite Employee",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"juan.operario@example.com\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/employees/{{employeeId}}/invitations", "host": ["{{base_url}}"], "path": ["api","v1","employees","{{employeeId}}","invitations"] }
+          }
+        },
+        {
+          "name": "List Employee Invitations",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/employees/invitations", "host": ["{{base_url}}"], "path": ["api","v1","employees","invitations"] }
+          }
+        },
+        {
+          "name": "Delete Employee",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/employees/{{employeeId}}", "host": ["{{base_url}}"], "path": ["api","v1","employees","{{employeeId}}"] }
+          }
+        }
+      ]
+    },
+    {
       "name": "Projects",
       "item": [
         { "name": "Create Project", "request": { "method": "POST", "header": [{ "key":"Content-Type","value":"application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }], "body": { "mode":"raw", "raw":"{\n  \"name\": \"Proyecto 1\",\n  \"description\": \"Descripción\"\n}" }, "url": { "raw":"{{base_url}}/api/v1/projects", "host":["{{base_url}}"], "path":["api","v1","projects"] } } },
@@ -240,10 +386,10 @@
     {
       "name": "Tasks",
       "item": [
-        { "name":"Create Task (project)", "request":{ "method":"POST","header":[{"key":"Content-Type","value":"application/json"}], "body":{"mode":"raw","raw":"{\n  \"title\": \"Tarea 1\",\n  \"description\": \"Desc\"\n}"}, "url":{ "raw":"{{base_url}}/api/v1/tasks/project/:projectId","host":["{{base_url}}"],"path":["api","v1","tasks","project",":projectId"] } } },
-        { "name":"Update Task", "request":{ "method":"PUT","header":[{"key":"Content-Type","value":"application/json"}], "body":{"mode":"raw","raw":"{\n  \"title\": \"Tarea actualizada\"\n}"}, "url":{ "raw":"{{base_url}}/api/v1/tasks/project/:projectId/:id","host":["{{base_url}}"],"path":["api","v1","tasks","project",":projectId",":id"] } } },
+        { "name":"Create Task (project)", "request":{ "method":"POST","header":[{"key":"Content-Type","value":"application/json"}], "body":{"mode":"raw","raw":"{\n  \"title\": \"Tarea 1\",\n  \"description\": \"Desc\",\n  \"list\": \"Tareas Pendientes\",\n  \"assignedEmployeeIds\": [\"{{employeeId}}\"]\n}"}, "url":{ "raw":"{{base_url}}/api/v1/tasks/project/:projectId","host":["{{base_url}}"],"path":["api","v1","tasks","project",":projectId"] } } },
+        { "name":"Update Task", "request":{ "method":"PUT","header":[{"key":"Content-Type","value":"application/json"}], "body":{"mode":"raw","raw":"{\n  \"title\": \"Tarea actualizada\",\n  \"assignedEmployeeIds\": [\"{{employeeId}}\"]\n}"}, "url":{ "raw":"{{base_url}}/api/v1/tasks/project/:projectId/:id","host":["{{base_url}}"],"path":["api","v1","tasks","project",":projectId",":id"] } } },
         { "name":"Patch Task Priority","request":{ "method":"PATCH","header":[{"key":"Content-Type","value":"application/json"}], "body":{"mode":"raw","raw":"{\n  \"priority\": \"HIGH\"\n}"}, "url":{ "raw":"{{base_url}}/api/v1/tasks/:id/priority","host":["{{base_url}}"],"path":["api","v1","tasks",":id","priority"] } } },
-        { "name":"Patch Task Assigned","request":{ "method":"PATCH","header":[{"key":"Content-Type","value":"application/json"}], "body":{"mode":"raw","raw":"{\n  \"assignedTo\": \"{{userId}}\"\n}"}, "url":{ "raw":"{{base_url}}/api/v1/tasks/:id/assigned","host":["{{base_url}}"],"path":["api","v1","tasks",":id","assigned"] } } },
+        { "name":"Patch Task Assigned","request":{ "method":"PATCH","header":[{"key":"Content-Type","value":"application/json"}], "body":{"mode":"raw","raw":"{\n  \"assignedEmployeeIds\": [\"{{employeeId}}\"]\n}"}, "url":{ "raw":"{{base_url}}/api/v1/tasks/:id/assigned","host":["{{base_url}}"],"path":["api","v1","tasks",":id","assigned"] } } },
         { "name":"Patch Task Status","request":{ "method":"PATCH","header":[{"key":"Content-Type","value":"application/json"}], "body":{"mode":"raw","raw":"{\n  \"status\": \"OPEN\"\n}"}, "url":{ "raw":"{{base_url}}/api/v1/tasks/:id/status","host":["{{base_url}}"],"path":["api","v1","tasks",":id","status"] } } },
         { "name":"Delete Task","request":{ "method":"DELETE","url":{ "raw":"{{base_url}}/api/v1/tasks/project/:projectId/:id","host":["{{base_url}}"],"path":["api","v1","tasks","project",":projectId",":id"] } } },
         { "name":"Get Tasks by List","request":{ "method":"GET","url":{ "raw":"{{base_url}}/api/v1/tasks/project/:projectId/list/:listName","host":["{{base_url}}"],"path":["api","v1","tasks","project",":projectId","list",":listName"] } } },
@@ -337,6 +483,9 @@
     { "key": "token", "value": "" },
     { "key": "userId", "value": "" },
     { "key": "activeCompanyId", "value": "" },
+    { "key": "emailVerificationToken", "value": "" },
+    { "key": "employeeId", "value": "" },
+    { "key": "employeeInvitationToken", "value": "" },
     { "key": "companyIdA", "value": "" },
     { "key": "companyIdB", "value": "" },
     { "key": "foreignCompanyId", "value": "" },
