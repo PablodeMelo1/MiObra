@@ -7,11 +7,11 @@ function phoneHref(phone) {
 
 function SupplierTable({ suppliers, getStats, onEdit, onDelete }) {
   if (suppliers.length === 0) {
-    return <p className="rounded border border-white/10 bg-[#10141d] p-4 text-sm text-white/60">No hay proveedores disponibles</p>;
+    return <p className="border-l-2 border-white/15 bg-white/[0.025] p-4 text-sm text-white/60">No hay proveedores disponibles</p>;
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-white/10 bg-[#10141d]">
+    <div className="overflow-x-auto border border-white/10 bg-[#101620]">
       <table className="min-w-[720px] text-sm">
         <thead className="bg-white/5 text-xs uppercase tracking-wide text-white/60">
           <tr>

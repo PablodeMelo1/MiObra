@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/sidebar';
+import PageShell from '../components/common/PageShell';
 import LoadingScreen from '../components/routing/LoadingScreen';
 import ProfileForm from '../components/profile/ProfileForm';
 import { useAuth } from '../context/auth-context';
@@ -88,15 +88,13 @@ function Profile() {
   if (isLoading || loadingProfile) return <LoadingScreen message="Cargando perfil..." />;
 
   return (
-    <div className="min-h-screen bg-[#0c0f14] text-white">
-      <div className="flex min-h-screen flex-col items-stretch gap-4 px-3 py-3 sm:px-5 lg:flex-row lg:items-start lg:px-6 lg:py-5">
-        <Sidebar />
-
-        <section className="min-w-0 flex-1 p-0 sm:p-3">
-          <div className="mb-3">
-            <h1 className="text-lg font-semibold">Perfil</h1>
+    <PageShell>
+      <div className="min-w-0">
+          <header className="mb-4 border-b border-white/10 pb-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-200/80">Cuenta</p>
+            <h1 className="mt-1 text-xl font-semibold tracking-tight">Perfil</h1>
             <p className="text-xs text-white/60">Visualiza y edita tus datos de usuario</p>
-          </div>
+          </header>
 
           <ProfileForm
             form={form}
@@ -106,9 +104,8 @@ function Profile() {
             onChange={handleChange}
             onSubmit={handleSubmit}
           />
-        </section>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

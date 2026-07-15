@@ -30,7 +30,7 @@ function CompanyInvitationsPanel({ invitations, canManage, sending, busyId, onIn
   if (!canManage) return null;
 
   return (
-    <section className="rounded-xl border border-white/10 bg-[#111723] p-4">
+    <section className="border-t border-white/15 pt-4">
       <div>
         <h2 className="text-sm font-semibold">Invitaciones</h2>
         <p className="mt-1 text-xs text-white/50">Invita usuarios que ya tengan una cuenta. El acceso de propietario no se otorga por invitacion.</p>
@@ -55,7 +55,7 @@ function CompanyInvitationsPanel({ invitations, canManage, sending, busyId, onIn
           const invitationId = invitation._id || invitation.id;
           const canRevoke = ['pending', 'sent'].includes(invitation.status);
           return (
-            <div key={invitationId} className="flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div key={invitationId} className="flex flex-col gap-2 border-b border-white/10 px-1 py-3 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">{invitation.email}</p>
                 <p className="mt-1 text-xs text-white/50">{roleOptions.find(([value]) => value === invitation.role)?.[1] || invitation.role} · {statusLabels[invitation.status] || invitation.status}</p>
@@ -64,7 +64,7 @@ function CompanyInvitationsPanel({ invitations, canManage, sending, busyId, onIn
             </div>
           );
         })}
-        {invitations.length === 0 ? <p className="rounded-lg border border-white/10 p-4 text-sm text-white/45">No hay invitaciones registradas.</p> : null}
+        {invitations.length === 0 ? <p className="border-l-2 border-white/15 bg-white/[0.025] p-4 text-sm text-white/45">No hay invitaciones registradas.</p> : null}
       </div>
     </section>
   );

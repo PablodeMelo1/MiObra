@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/sidebar';
+import PageShell from '../components/common/PageShell';
 import LoadingScreen from '../components/routing/LoadingScreen';
 import { useAuth } from '../context/auth-context';
 import { getUsers } from '../api/user';
@@ -184,14 +184,13 @@ function Employees() {
   if (isLoading || loading) return <LoadingScreen message="Cargando empleados..." />;
 
   return (
-    <div className="min-h-screen bg-[#0c0f14] text-white">
-      <div className="flex min-h-screen flex-col items-stretch gap-4 px-3 py-3 sm:px-5 lg:flex-row lg:items-start lg:px-6 lg:py-5">
-        <Sidebar />
-        <main className="min-w-0 flex-1 p-0 sm:p-3">
-          <div className="mb-4">
-            <h1 className="text-lg font-semibold">Empleados</h1>
+    <PageShell>
+      <div className="min-w-0">
+          <header className="mb-4 border-b border-white/10 pb-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-200/80">Equipo</p>
+            <h1 className="mt-1 text-xl font-semibold tracking-tight">Empleados</h1>
             <p className="text-xs text-white/60">Gestion operativa del personal y vinculacion con cuentas de acceso.</p>
-          </div>
+          </header>
 
           {(message || error) && (
             <div className={`mb-4 rounded-lg border px-3 py-2 text-sm ${error ? 'border-rose-300/25 bg-rose-500/10 text-rose-100' : 'border-cyan-300/25 bg-cyan-500/10 text-cyan-50'}`}>
@@ -199,7 +198,7 @@ function Employees() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="mb-5 rounded-lg border border-white/10 bg-[#111722] p-4">
+          <form onSubmit={handleSubmit} className="mb-5 border-t border-white/15 pt-4">
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <label className="space-y-1 sm:col-span-2">
                 <span className="text-xs text-white/70">Nombre completo</span>
@@ -261,7 +260,7 @@ function Employees() {
             </div>
           </form>
 
-          <div className="overflow-hidden rounded-lg border border-white/10">
+          <div className="overflow-x-auto rounded-lg border border-white/10">
             <table className="w-full min-w-[780px] text-left text-sm">
               <thead className="bg-white/5 text-xs text-white/60">
                 <tr>
@@ -298,9 +297,8 @@ function Employees() {
               </tbody>
             </table>
           </div>
-        </main>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

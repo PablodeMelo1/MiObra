@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
@@ -18,6 +18,7 @@ import Employees from './pages/Employees';
 import NotFound from './pages/NotFound';
 import AcceptEmployeeInvitationPage from './pages/AcceptEmployeeInvitationPage';
 import CompanyInvitationPage from './pages/CompanyInvitationPage';
+import WelcomePage from './pages/WelcomePage';
 import ProtectedRoute from './components/routing/ProtectedRoute';
 import PublicRoute from './components/routing/PublicRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -28,6 +29,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<PublicRoute />}>
+            <Route path="/" element={<WelcomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
           </Route>
@@ -36,7 +38,6 @@ function App() {
           <Route path="/employee-invitations/accept" element={<AcceptEmployeeInvitationPage />} />
 
           <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/projects" element={<Projects />} />

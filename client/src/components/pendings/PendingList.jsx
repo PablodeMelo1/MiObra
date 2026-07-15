@@ -12,7 +12,7 @@ function formatDate(value) {
 function PendingList({ pendings, onToggleDone, onEdit, onDelete }) {
   if (pendings.length === 0) {
     return (
-      <p className="rounded-xl border border-cyan-300/15 bg-[#101722] p-4 text-sm text-white/65">
+      <p className="border-l-2 border-white/15 bg-white/[0.025] p-4 text-sm text-white/65">
         No hay pendientes para mostrar.
       </p>
     );
@@ -27,10 +27,10 @@ function PendingList({ pendings, onToggleDone, onEdit, onDelete }) {
         return (
           <article
             key={id}
-            className={`rounded-xl border p-3 transition ${
+            className={`border-l-2 px-3 py-3 transition-colors ${
               done
-                ? 'border-emerald-300/20 bg-emerald-500/10'
-                : 'border-cyan-300/15 bg-[#101722] hover:border-cyan-300/30'
+                ? 'border-emerald-300/45 bg-emerald-500/[0.06]'
+                : 'border-white/15 bg-[#101722] hover:border-cyan-300/45'
             }`}
           >
             <div className="flex flex-wrap items-start gap-3">

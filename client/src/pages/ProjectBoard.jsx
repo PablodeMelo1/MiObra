@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Sidebar from '../components/sidebar';
+import PageShell from '../components/common/PageShell';
 import LoadingScreen from '../components/routing/LoadingScreen';
 import { getProjectById, updateProject } from '../api/projects';
 import {
@@ -616,22 +616,16 @@ function ProjectBoard() {
 
   if (errorMessage) {
     return (
-      <div className="min-h-screen bg-[#0c0f14] text-white">
-        <div className="flex min-h-screen flex-col items-stretch gap-4 px-3 py-3 sm:px-5 lg:flex-row lg:items-start lg:px-6 lg:py-5">
-          <Sidebar />
-          <p className="mt-5 text-white/70">{errorMessage}</p>
-        </div>
-      </div>
+      <PageShell>
+        <p role="alert" className="border-l-2 border-rose-300/60 bg-rose-500/10 px-4 py-3 text-sm text-rose-100">{errorMessage}</p>
+      </PageShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0c0f14] text-white">
-      <div className="flex min-h-screen flex-col items-stretch gap-4 px-3 py-3 sm:px-5 lg:flex-row lg:items-start lg:px-6 lg:py-5">
-        <Sidebar />
-
-        <section className="min-w-0 flex-1 p-0 sm:p-3">
-          <div className="min-h-screen rounded-xl border border-white/10 bg-[#10141d] p-3 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+    <PageShell>
+      <div className="min-w-0">
+          <div className="min-h-[calc(100vh-2rem)] border border-white/10 bg-[#10141d] p-3">
             <BoardHeader
               project={project}
               boardMessage={boardMessage}
@@ -679,7 +673,6 @@ function ProjectBoard() {
               ))}
             </div>
           </div>
-        </section>
       </div>
 
       <TaskModal
@@ -718,7 +711,7 @@ function ProjectBoard() {
         }}
         onSubmit={handleRenameColumnSubmit}
       />
-    </div>
+    </PageShell>
   );
 }
 

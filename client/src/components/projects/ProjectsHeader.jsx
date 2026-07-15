@@ -1,15 +1,15 @@
 function ProjectsHeader({ onOpenCreate }) {
   return (
-    <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-      <h1 className="text-lg font-semibold">Proyectos</h1>
+    <header className="mb-4 flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-end sm:justify-between">
+      <div><p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-200/80">Operacion</p><h1 className="mt-1 text-xl font-semibold tracking-tight">Proyectos</h1></div>
       <button
         type="button"
         onClick={onOpenCreate}
-        className="w-full rounded border border-white/20 bg-[#1b2331] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#253247] sm:w-auto"
+        className="w-full border border-cyan-300/30 px-3 py-2 text-sm font-medium text-cyan-100 hover:bg-cyan-500/10 sm:w-auto"
       >
         Nuevo proyecto
       </button>
-    </div>
+    </header>
   );
 }
 

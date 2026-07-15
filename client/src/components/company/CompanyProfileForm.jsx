@@ -39,7 +39,7 @@ function CompanyProfileForm({ company, canManage, saving, onSave }) {
   };
 
   return (
-    <section className="rounded-xl border border-white/10 bg-[#111723] p-4">
+    <section className="border-t border-white/15 pt-4">
       <div className="mb-4">
         <h2 className="text-sm font-semibold">Datos de la empresa</h2>
         <p className="mt-1 text-xs text-white/50">Identidad y preferencias de la empresa activa.</p>

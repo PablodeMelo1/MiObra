@@ -5,7 +5,7 @@ function CompanySwitcher({ companies, activeCompanyId, switching, onSwitch }) {
   const hasMultipleCompanies = companies.length > 1;
 
   return (
-    <section className="rounded-xl border border-white/10 bg-[#111723] p-4">
+    <section className="border-t border-white/15 pt-4">
       <div>
         <h2 className="text-sm font-semibold">Empresa activa</h2>
         <p className="mt-1 text-xs text-white/50">Selecciona el espacio que deseas administrar.</p>

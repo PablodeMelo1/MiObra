@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import InventoryHistoryHeader from '../components/inventory/InventoryHistoryHeader';
 import InventoryHistoryTable from '../components/inventory/InventoryHistoryTable';
-import Sidebar from '../components/sidebar';
+import PageShell from '../components/common/PageShell';
 import LoadingScreen from '../components/routing/LoadingScreen';
 import { useAuth } from '../context/auth-context';
 import { getInventoryActivities } from '../api/items';
@@ -42,16 +42,12 @@ function InventoryHistory() {
   if (isLoading || loadingData) return <LoadingScreen message="Cargando historial..." />;
 
   return (
-    <div className="min-h-screen bg-[#0c0f14] text-white">
-      <div className="flex min-h-screen flex-col items-stretch gap-4 px-3 py-3 sm:px-5 lg:flex-row lg:items-start lg:px-6 lg:py-5">
-        <Sidebar />
-
-        <section className="min-w-0 flex-1 p-0 sm:p-3">
+    <PageShell>
+      <div className="min-w-0">
           <InventoryHistoryHeader onBack={() => navigate('/inventory')} errorMessage={errorMessage} />
           <InventoryHistoryTable activities={activities} />
-        </section>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

@@ -23,7 +23,7 @@ function ProjectInfoDrawer({
   if (!isOpen) return null;
 
   return (
-    <aside className="mb-3 rounded-lg border border-white/10 bg-[#0f1520] p-3">
+    <aside className="mb-3 border-y border-white/10 bg-[#0f1520] py-3">
       <div className="mb-3 flex flex-col gap-2 border-b border-white/10 pb-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex gap-2 overflow-x-auto">
           {tabs.map((tab) => (

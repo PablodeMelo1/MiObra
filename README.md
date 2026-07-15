@@ -9,6 +9,7 @@ Sistema de gestion de obras.
 - Roadmap de producto: [docs/roadmap-producto.md](./docs/roadmap-producto.md)
 - SaaS multi-tenant: [docs/saas-multitenancy.md](./docs/saas-multitenancy.md)
 - Verificacion: [docs/verification.md](./docs/verification.md)
+- Portal publico y propuesta de planes: [docs/portal-publico-y-planes.md](./docs/portal-publico-y-planes.md)
 - Convenciones rapidas: [CONVENTIONS.md](./CONVENTIONS.md)
 - Validar frontend: `npm run lint`
 - Build del cliente: `npm run build:client`

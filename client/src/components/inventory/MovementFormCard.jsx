@@ -19,13 +19,13 @@ function MovementFormCard({
   onSubmit,
 }) {
   return (
-    <div className="mb-4 rounded-2xl border border-white/10 bg-[#111723] p-4">
+    <section className="mb-4 border-t border-white/15 pt-4">
       <h2 className="mb-3 text-base font-semibold">Registrar movimiento</h2>
 
-      <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-2">
+      <form onSubmit={onSubmit} className="grid gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(15rem,1fr)_10rem_9rem_auto] xl:items-end">
         <label className="text-sm text-white/80">
           Usuario
-          <div ref={userDropdownRef} className="relative mt-1 w-72">
+          <div ref={userDropdownRef} className="relative mt-1 w-full">
             <button
               type="button"
               onClick={onToggleDropdown}
@@ -78,7 +78,7 @@ function MovementFormCard({
 
         <label className="text-sm text-white/80">
           Tipo
-          <div className="relative mt-1 w-40">
+          <div className="relative mt-1 w-full">
             <select
               value={movementMode}
               onChange={(event) => onMovementMode(event.target.value)}
@@ -98,7 +98,7 @@ function MovementFormCard({
             min="1"
             value={movementQty}
             onChange={(event) => onMovementQty(event.target.value)}
-            className="mt-1 w-36 rounded-md border border-white/15 bg-black/20 px-3 py-2 text-sm outline-none"
+            className="mt-1 w-full rounded-md border border-white/15 bg-black/20 px-3 py-2 text-sm outline-none"
           />
         </label>
 
@@ -112,7 +112,7 @@ function MovementFormCard({
       </form>
 
       {movementError ? <p className="mt-2 text-xs text-rose-200">{movementError}</p> : null}
-    </div>
+    </section>
   );
 }
 

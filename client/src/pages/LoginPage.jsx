@@ -51,6 +51,9 @@ function LoginPage() {
   return (
     <main className="grid min-h-screen bg-[#0c0f14] px-4 py-8 text-white sm:place-items-center">
       <section className="mx-auto w-full max-w-md self-center rounded-2xl border border-white/10 bg-[#111723] p-5 shadow-2xl sm:p-8">
+        <Link to="/" className="mb-5 inline-flex items-center gap-2 text-sm text-white/50 transition hover:text-cyan-100">
+          <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Volver al inicio
+        </Link>
         <div className="mb-6 text-center">
           <p className="text-sm font-semibold tracking-[0.22em] text-cyan-200">MIOBRA</p>
           <h1 className="mt-2 text-2xl font-semibold">Iniciar sesion</h1>

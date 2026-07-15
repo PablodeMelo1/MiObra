@@ -2,7 +2,7 @@
 
 Este archivo es el punto de entrada para cualquier agente que trabaje en
 MiObra. El harness usa un flujo multiagente secuencial obligatorio:
-`leader` -> `implementer` -> `reviewer`.
+`leader` -> `frontend-designer` -> `implementer` -> `reviewer`.
 
 El objetivo es orientar al agente, evitar trabajo fuera de scope y validar con
 comandos reales del repositorio.
@@ -13,9 +13,12 @@ Toda tarea debe pasar por estas etapas:
 
 1. `leader`: analiza la solicitud, lee contexto, define scope y prepara un
    plan corto.
-2. `implementer`: implementa exactamente ese scope y ajusta o agrega
+2. `frontend-designer`: cuando el scope incluye frontend, analiza el producto
+   y el sistema visual, prepara el plan de interfaz e implementa la
+   presentacion; en tareas sin frontend emite `NO_APLICA` sin editar archivos.
+3. `implementer`: completa e integra exactamente ese scope y ajusta o agrega
    ejemplos y verificaciones cuando corresponda.
-3. `reviewer`: revisa el diff, valida contra los docs y ejecuta la verificacion
+4. `reviewer`: revisa el diff, valida contra los docs y ejecuta la verificacion
    final disponible para el area tocada.
 
 La configuracion del harness vive en `.agents/settings.json` y las definiciones
@@ -48,12 +51,17 @@ de cada agente estan en `.agents/agentes/`.
 | `api/index.mjs` | Entrada serverless usada por Vercel | Cuando el cambio afecta deploy o arranque |
 | `postman_collection.json` | Coleccion local de requests para probar endpoints | Cuando cambian endpoints HTTP |
 | `.agents/settings.json` | Configuracion del harness multiagente y comandos | Siempre, al iniciar |
-| `.agents/agentes/` | Perfiles obligatorios de `leader`, `implementer` y `reviewer` | Siempre que se ejecute una tarea |
+| `.agents/agentes/` | Perfiles obligatorios de `leader`, `frontend-designer`, `implementer` y `reviewer` | Siempre que se ejecute una tarea |
 
 ## 4. Reglas de trabajo
 
 - Trabaja una sola solicitud por vez. No mezcles features no pedidas.
-- Usa siempre el orden `leader` -> `implementer` -> `reviewer`.
+- Usa siempre el orden `leader` -> `frontend-designer` -> `implementer` ->
+  `reviewer`.
+- `frontend-designer` concentra UX, UI, estructura visual, componentes
+  frontend y calidad de presentacion. `implementer` conserva la
+  responsabilidad general de completar e integrar el alcance, incluida la
+  logica de negocio, backend, contratos y verificaciones.
 - Mantene el cambio lo mas chico posible y alineado con la estructura
   existente.
 - No inventes sistemas de progreso, checkpoints ni listas de features.

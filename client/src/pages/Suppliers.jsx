@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/sidebar';
+import PageShell from '../components/common/PageShell';
 import LoadingScreen from '../components/routing/LoadingScreen';
 import SupplierHeader from '../components/suppliers/SupplierHeader';
 import SupplierTable from '../components/suppliers/SupplierTable';
@@ -194,11 +194,8 @@ function Suppliers() {
   if (isLoading || loadingSuppliers) return <LoadingScreen message="Cargando proveedores..." />;
 
   return (
-    <div className="min-h-screen bg-[#0c0f14] text-white">
-      <div className="flex min-h-screen flex-col items-stretch gap-4 px-3 py-3 sm:px-5 lg:flex-row lg:items-start lg:px-6 lg:py-5">
-        <Sidebar />
-
-        <section className="min-w-0 flex-1 p-0 sm:p-3">
+    <PageShell>
+      <div className="min-w-0">
           <SupplierHeader
             searchValue={searchValue}
             onSearchChange={setSearchValue}
@@ -213,7 +210,6 @@ function Suppliers() {
             onEdit={openEditModal}
             onDelete={openDeleteModal}
           />
-        </section>
       </div>
 
       <SupplierFormModal
@@ -233,7 +229,7 @@ function Suppliers() {
         onClose={closeDeleteModal}
         onConfirm={handleDeleteSupplier}
       />
-    </div>
+    </PageShell>
   );
 }
 

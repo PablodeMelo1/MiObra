@@ -2,7 +2,7 @@ import ProjectCard from '../card';
 
 function ProjectsList({ projects }) {
   if (projects.length === 0) {
-    return <p className="rounded-lg border border-dashed border-white/10 p-5 text-center text-sm text-white/60">No hay proyectos disponibles</p>;
+    return <p className="border-l-2 border-white/15 bg-white/[0.025] p-5 text-sm text-white/60">No hay proyectos disponibles</p>;
   }
 
   return (
