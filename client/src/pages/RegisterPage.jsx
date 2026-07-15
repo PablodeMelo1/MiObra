@@ -10,7 +10,6 @@ function RegisterPage() {
   const { signUp, resendEmailVerification } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const invitationToken = searchParams.get('invitationToken') || '';
   const employeeInvitationToken = searchParams.get('employeeInvitationToken') || '';
   const [serverError, setServerError] = useState('');
   const [pendingVerification, setPendingVerification] = useState(null);
@@ -27,7 +26,6 @@ function RegisterPage() {
         email: data.email.trim().toLowerCase(),
         password: data.password,
         companyName: data.companyName?.trim(),
-        invitationToken: invitationToken || undefined,
         employeeInvitationToken: employeeInvitationToken || undefined,
       });
       setPendingVerification(response.data);
@@ -68,7 +66,11 @@ function RegisterPage() {
           <div className="space-y-4">
             <div className="rounded-lg border border-emerald-300/25 bg-emerald-500/10 px-3 py-3 text-sm text-emerald-50">
               <p className="font-medium">Cuenta creada pendiente de verificacion.</p>
-              <p className="mt-1 text-emerald-50/75">Te enviamos un link a {pendingVerification.email}. Verifica tu email para iniciar sesion.</p>
+              <p className="mt-1 text-emerald-50/75">
+                {pendingVerification.emailDeliveryStatus === 'failed'
+                  ? `No pudimos enviar el link a ${pendingVerification.email}. Usa el reenvio para intentarlo nuevamente.`
+                  : `Te enviamos un link a ${pendingVerification.email}. Verifica tu email para iniciar sesion.`}
+              </p>
               {pendingVerification.devVerificationUrl && (
                 <a className="mt-2 block break-all text-cyan-100 hover:underline" href={pendingVerification.devVerificationUrl}>Abrir link de verificacion local</a>
               )}
@@ -91,7 +93,7 @@ function RegisterPage() {
             </div>
           ))}
 
-          {!invitationToken && !employeeInvitationToken && (
+          {!employeeInvitationToken && (
             <div>
               <label htmlFor="register-company" className="mb-1.5 block text-sm text-white/75">Empresa</label>
               <input id="register-company" type="text" autoComplete="organization" placeholder="Nombre de la empresa" aria-invalid={Boolean(errors.companyName)}
@@ -102,12 +104,6 @@ function RegisterPage() {
                   onChange: clearServerError,
                 })} className={inputClassName} />
               {errors.companyName && <p className="mt-1.5 text-xs text-rose-300">{errors.companyName.message}</p>}
-            </div>
-          )}
-
-          {invitationToken && (
-            <div className="rounded-lg border border-cyan-300/25 bg-cyan-500/10 px-3 py-2.5 text-sm text-cyan-100">
-              Vas a crear tu cuenta dentro de la empresa que te invito.
             </div>
           )}
 

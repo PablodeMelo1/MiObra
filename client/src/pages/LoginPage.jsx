@@ -23,7 +23,11 @@ function LoginPage() {
       setUnverifiedEmail('');
       setResendMessage('');
       await signIn({ email: data.email.trim().toLowerCase(), password: data.password });
-      navigate(location.state?.from?.pathname || '/dashboard', { replace: true });
+      const returnLocation = location.state?.from;
+      const returnPath = returnLocation
+        ? `${returnLocation.pathname || ''}${returnLocation.search || ''}${returnLocation.hash || ''}`
+        : '/dashboard';
+      navigate(returnPath, { replace: true });
     } catch (error) {
       if (error?.response?.data?.code === 'EMAIL_NOT_VERIFIED') {
         setUnverifiedEmail(error.response.data.email || data.email.trim().toLowerCase());

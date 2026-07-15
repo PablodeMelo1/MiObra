@@ -17,6 +17,7 @@ import Settings from './pages/Settings';
 import Employees from './pages/Employees';
 import NotFound from './pages/NotFound';
 import AcceptEmployeeInvitationPage from './pages/AcceptEmployeeInvitationPage';
+import CompanyInvitationPage from './pages/CompanyInvitationPage';
 import ProtectedRoute from './components/routing/ProtectedRoute';
 import PublicRoute from './components/routing/PublicRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -52,6 +53,7 @@ function App() {
             <Route path="/pendings/:id/edit" element={<Pendings />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/company-invitations/accept" element={<CompanyInvitationPage />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

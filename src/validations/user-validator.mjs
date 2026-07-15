@@ -19,16 +19,11 @@ export const validateSingup = Joi.object({
     name: Joi.string().min(3).max(40).required(),
     email: Joi.string().regex(/.+@.+\..+/).required(),
     password: Joi.string().min(3).max(20).required(),
-    companyName: Joi.string().min(2).max(80).when('invitationToken', {
+    companyName: Joi.string().min(2).max(80).when('employeeInvitationToken', {
         is: Joi.exist(),
         then: Joi.optional(),
-        otherwise: Joi.when('employeeInvitationToken', {
-            is: Joi.exist(),
-            then: Joi.optional(),
-            otherwise: Joi.required(),
-        }),
+        otherwise: Joi.required(),
     }),
-    invitationToken: Joi.string().min(20).max(200).optional(),
     employeeInvitationToken: Joi.string().min(20).max(200).optional(),
     profileImage: Joi.string().uri().optional(),
     profileImagePublicId: Joi.string().optional()

@@ -31,6 +31,12 @@ NODE_ENV=production
 PASS_JWT=<secreto-largo>
 MONGO_BD_IN_USE=atlas
 MONGO_ATLAS_URI=<connection-string-de-mongodb-atlas>
+SMTP_HOST=<host-smtp>
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=<usuario-smtp>
+SMTP_PASS=<clave-smtp>
+SMTP_FROM=MiObra <no-reply@tu-dominio.com>
 ```
 
 Opcional:
@@ -38,7 +44,11 @@ Opcional:
 ```env
 CLIENT_URL=https://tu-dominio.vercel.app
 VITE_API_URL=
+RESEND_API_KEY=<opcional-solo-para-invitaciones-de-empleados>
+EMAIL_FROM=MiObra <no-reply@tu-dominio.com>
 ```
+
+El registro envia la validacion de email por SMTP mediante Nodemailer. En desarrollo, si SMTP no esta configurado, el backend muestra el link de verificacion en la respuesta y en consola; en produccion la configuracion SMTP es obligatoria. Resend se mantiene solamente para las invitaciones de empleados.
 
 Si frontend y API estan en el mismo proyecto de Vercel, `VITE_API_URL` puede quedar sin definir para usar `/api` en el mismo dominio.
 

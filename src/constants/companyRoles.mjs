@@ -24,6 +24,7 @@ export const COMPANY_INVITATION_STATUS = Object.freeze({
     PENDING: 'pending',
     SENT: 'sent',
     ACCEPTED: 'accepted',
+    DECLINED: 'declined',
     EXPIRED: 'expired',
     REVOKED: 'revoked',
 });
