@@ -204,7 +204,7 @@ Eso permite:
 
 - separa acceso del sistema de la realidad operativa de la empresa,
 - evita crear cuentas para todo el personal,
-- mejora asignacion y trazabilidad,
+-nacion y trazabilidad,
 - permite crecer hacia asistencia, cuadrillas, productividad y costos por
   persona.
 

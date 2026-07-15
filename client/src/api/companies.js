@@ -8,6 +8,10 @@ export const updateCurrentCompany = (payload) => api.put('/api/v1/companies/curr
 
 export const getCompanyMembers = () => api.get('/api/v1/companies/members');
 
+export const updateCompanyMemberRole = (id, role) => api.put(`/api/v1/companies/members/${id}/role`, { role });
+
+export const deactivateCompanyMember = (id) => api.delete(`/api/v1/companies/members/${id}`);
+
 export const createCompanyInvitation = (payload) => api.post('/api/v1/companies/invitations', payload);
 
 export const getCompanyInvitations = () => api.get('/api/v1/companies/invitations');

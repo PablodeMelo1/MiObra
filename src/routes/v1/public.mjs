@@ -1,6 +1,8 @@
 import express from "express";
 import {
     acceptCompanyInvitation,
+    declineCompanyInvitation,
+    previewCompanyInvitation,
     confirmEmailVerification,
     createUser,
     loginUser,
@@ -28,7 +30,9 @@ routes.post("/email-verification/confirm", validateRequest(validateEmailVerifica
 routes.post("/email-verification/resend", validateRequest(validateEmailVerificationResend, reqValidate.BODY), resendEmailVerification);
 routes.post("/logout", authMiddleware, logout);
 routes.get("/me", authMiddleware, requireVerifiedEmail, loadCompanyContext({ required: false }), verifySession);
+routes.get("/company-invitations/:token", authMiddleware, requireVerifiedEmail, previewCompanyInvitation);
 routes.post("/company-invitations/:token/accept", authMiddleware, requireVerifiedEmail, acceptCompanyInvitation);
+routes.post("/company-invitations/:token/decline", authMiddleware, requireVerifiedEmail, declineCompanyInvitation);
 routes.post("/employee-invitations/:token/accept", authMiddleware, requireVerifiedEmail, acceptEmployeeInvitation);
 
 export default routes;

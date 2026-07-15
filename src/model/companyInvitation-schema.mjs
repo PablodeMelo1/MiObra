@@ -25,6 +25,8 @@ const companyInvitationSchema = new mongoose.Schema({
     expiresAt: { type: Date, required: true },
     acceptedAt: { type: Date, default: null },
     acceptedUserId: { type: ObjectId, ref: 'User', default: null },
+    declinedAt: { type: Date, default: null },
+    declinedUserId: { type: ObjectId, ref: 'User', default: null },
     createdByUserId: { type: ObjectId, ref: 'User', required: true, immutable: true },
 }, { timestamps: true });
 

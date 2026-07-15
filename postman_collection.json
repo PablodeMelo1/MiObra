@@ -24,7 +24,8 @@
               "raw": "{{base_url}}/api/v1/auth/signup",
               "host": ["{{base_url}}"],
               "path": ["api","v1","auth","signup"]
-            }
+            },
+            "description": "Crea una cuenta pendiente y envia la validacion mediante Nodemailer/SMTP. En desarrollo sin SMTP, copiar el token desde devVerificationUrl a {{emailVerificationToken}}."
           }
         },
         {
@@ -97,7 +98,46 @@
               "raw": "{{base_url}}/api/v1/auth/email-verification/resend",
               "host": ["{{base_url}}"],
               "path": ["api","v1","auth","email-verification","resend"]
-            }
+            },
+            "description": "Genera un token nuevo y reintenta el envio SMTP. Puede responder 429 por cooldown o 503 EMAIL_DELIVERY_FAILED si falla SMTP."
+          }
+        },
+        {
+          "name": "Resend privacy - unknown email",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"unknown@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/email-verification/resend",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","auth","email-verification","resend"]
+            },
+            "description": "Debe responder 200 con el mismo mensaje generico que una cuenta ya verificada, sin revelar si existe."
+          }
+        },
+        {
+          "name": "Resend privacy - verified email",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"verified@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/email-verification/resend",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","auth","email-verification","resend"]
+            },
+            "description": "Con una cuenta verificada debe responder exactamente igual que para un email inexistente."
           }
         },
         {
@@ -116,6 +156,21 @@
           }
         },
         {
+          "name": "Preview Company Invitation",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/company-invitations/{{companyInvitationToken}}",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","auth","company-invitations","{{companyInvitationToken}}"]
+            },
+            "description": "Valida SENT, vigencia y que el email de la sesion coincida. No acepta automaticamente ni crea membresia."
+          }
+        },
+        {
           "name": "Accept Company Invitation",
           "request": {
             "method": "POST",
@@ -126,7 +181,117 @@
               "raw": "{{base_url}}/api/v1/auth/company-invitations/{{companyInvitationToken}}/accept",
               "host": ["{{base_url}}"],
               "path": ["api","v1","auth","company-invitations","{{companyInvitationToken}}","accept"]
-            }
+            },
+            "description": "Confirmacion explicita: acepta una invitacion SENT, reactiva membresia disabled si existe y devuelve el contexto con la nueva empresa activa."
+          }
+        },
+        {
+          "name": "Decline Company Invitation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/company-invitations/{{companyInvitationToken}}/decline",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","auth","company-invitations","{{companyInvitationToken}}","decline"]
+            },
+            "description": "Marca DECLINED con usuario y fecha, sin crear ni reactivar una membresia."
+          }
+        },
+        {
+          "name": "Company Invitation Email Mismatch",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{otherUserToken}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/company-invitations/{{companyInvitationToken}}",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","auth","company-invitations","{{companyInvitationToken}}"]
+            },
+            "description": "Debe responder 403 con code INVITATION_EMAIL_MISMATCH para permitir cambiar de cuenta conservando el link."
+          }
+        },
+        {
+          "name": "Reject Expired Company Invitation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/company-invitations/{{expiredCompanyInvitationToken}}/accept",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","auth","company-invitations","{{expiredCompanyInvitationToken}}","accept"]
+            },
+            "description": "Con un token SENT cuyo expiresAt ya paso debe responder 409 y no crear ni reactivar membresia."
+          }
+        },
+        {
+          "name": "Reject Reuse of Accepted Company Invitation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/company-invitations/{{acceptedCompanyInvitationToken}}/accept",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","auth","company-invitations","{{acceptedCompanyInvitationToken}}","accept"]
+            },
+            "description": "Debe responder 409 porque una invitacion ACCEPTED no puede reutilizarse."
+          }
+        },
+        {
+          "name": "Reject Reuse of Declined Company Invitation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/company-invitations/{{declinedCompanyInvitationToken}}/accept",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","auth","company-invitations","{{declinedCompanyInvitationToken}}","accept"]
+            },
+            "description": "Debe responder 409 porque una invitacion DECLINED no puede aceptarse despues."
+          }
+        },
+        {
+          "name": "Reject Reuse of Revoked Company Invitation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/company-invitations/{{revokedCompanyInvitationToken}}/accept",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","auth","company-invitations","{{revokedCompanyInvitationToken}}","accept"]
+            },
+            "description": "Debe responder 409 porque una invitacion REVOKED no puede reutilizarse."
+          }
+        },
+        {
+          "name": "Reject Company Invitation Token on Signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Invitado\",\n  \"email\": \"invitado@example.com\",\n  \"password\": \"secret\",\n  \"invitationToken\": \"{{companyInvitationToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/signup",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","auth","signup"]
+            },
+            "description": "Debe responder 400: las invitaciones de empresa requieren una cuenta existente y ya no se aceptan durante signup."
           }
         },
         {
@@ -185,6 +350,20 @@
           }
         },
         {
+          "name": "Update Active Company",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Constructora Demo\",\n  \"legalName\": \"Constructora Demo SA\",\n  \"taxId\": \"210000000001\",\n  \"timezone\": \"America/Montevideo\",\n  \"currency\": \"UYU\",\n  \"logoUrl\": \"https://example.com/logo.png\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/companies/current", "host": ["{{base_url}}"], "path": ["api","v1","companies","current"] },
+            "description": "Requiere rol owner o admin. name es obligatorio."
+          }
+        },
+        {
           "name": "List Company Members",
           "request": {
             "method": "GET",
@@ -193,6 +372,43 @@
               { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
             ],
             "url": { "raw": "{{base_url}}/api/v1/companies/members", "host": ["{{base_url}}"], "path": ["api","v1","companies","members"] }
+          }
+        },
+        {
+          "name": "Update Company Member Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"manager\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/companies/members/{{companyMemberId}}/role", "host": ["{{base_url}}"], "path": ["api","v1","companies","members","{{companyMemberId}}","role"] },
+            "description": "Owner/admin pueden administrar roles. Solo owner puede asignar owner y nunca puede eliminarse el ultimo owner."
+          }
+        },
+        {
+          "name": "Deactivate Company Member",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/companies/members/{{companyMemberId}}", "host": ["{{base_url}}"], "path": ["api","v1","companies","members","{{companyMemberId}}"] },
+            "description": "No permite auto-desactivacion, que un admin desactive owner ni dejar la empresa sin owner."
+          }
+        },
+        {
+          "name": "List Company Invitations",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/companies/invitations", "host": ["{{base_url}}"], "path": ["api","v1","companies","invitations"] }
           }
         },
         {
@@ -205,7 +421,127 @@
               { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
             ],
             "body": { "mode": "raw", "raw": "{\n  \"email\": \"invitado@example.com\",\n  \"role\": \"operator\"\n}" },
-            "url": { "raw": "{{base_url}}/api/v1/companies/invitations", "host": ["{{base_url}}"], "path": ["api","v1","companies","invitations"] }
+            "url": { "raw": "{{base_url}}/api/v1/companies/invitations", "host": ["{{base_url}}"], "path": ["api","v1","companies","invitations"] },
+            "description": "Solo invita usuarios existentes. Envia por Nodemailer/SMTP hacia /company-invitations/accept?token= y marca sent solo tras la entrega. En desarrollo sin SMTP expone token/acceptUrl; en produccion un fallo devuelve 503 EMAIL_DELIVERY_FAILED y conserva pending."
+          }
+        },
+        {
+          "name": "Reject Owner Company Invitation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"invitado@example.com\",\n  \"role\": \"owner\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/companies/invitations", "host": ["{{base_url}}"], "path": ["api","v1","companies","invitations"] },
+            "description": "Debe responder 400: owner no es un rol permitido en invitaciones."
+          }
+        },
+        {
+          "name": "Reject Invitation for Active Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{activeMemberEmail}}\",\n  \"role\": \"operator\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/companies/invitations", "host": ["{{base_url}}"], "path": ["api","v1","companies","invitations"] },
+            "description": "Debe responder 409 cuando el email ya corresponde a una membresia activa de la empresa."
+          }
+        },
+        {
+          "name": "Reject Invitation for Unknown User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"sin-cuenta@example.com\",\n  \"role\": \"operator\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/companies/invitations", "host": ["{{base_url}}"], "path": ["api","v1","companies","invitations"] },
+            "description": "Debe responder 404 porque las invitaciones de empresa sólo se envian a usuarios existentes."
+          }
+        },
+        {
+          "name": "Revoke Company Invitation",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/companies/invitations/{{companyInvitationId}}", "host": ["{{base_url}}"], "path": ["api","v1","companies","invitations","{{companyInvitationId}}"] }
+          }
+        },
+        {
+          "name": "Forbidden - Admin Changes Owner Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"manager\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/companies/members/{{ownerCompanyMemberId}}/role", "host": ["{{base_url}}"], "path": ["api","v1","companies","members","{{ownerCompanyMemberId}}","role"] },
+            "description": "Autenticado como admin debe responder 403 al intentar modificar un owner."
+          }
+        },
+        {
+          "name": "Forbidden - Admin Deactivates Owner",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/companies/members/{{ownerCompanyMemberId}}", "host": ["{{base_url}}"], "path": ["api","v1","companies","members","{{ownerCompanyMemberId}}"] },
+            "description": "Autenticado como admin debe responder 403 al intentar desactivar un owner."
+          }
+        },
+        {
+          "name": "Reject Self Deactivation",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/v1/companies/members/{{selfCompanyMemberId}}", "host": ["{{base_url}}"], "path": ["api","v1","companies","members","{{selfCompanyMemberId}}"] },
+            "description": "Debe responder 400 al intentar desactivar la membresia correspondiente al token actual."
+          }
+        },
+        {
+          "name": "Reject Last Owner Demotion",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"admin\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/companies/members/{{lastOwnerCompanyMemberId}}/role", "host": ["{{base_url}}"], "path": ["api","v1","companies","members","{{lastOwnerCompanyMemberId}}","role"] },
+            "description": "En una empresa con un solo owner debe responder 409 y conservarlo."
+          }
+        },
+        {
+          "name": "Cross Tenant Mutation Forbidden",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "X-Company-Id", "value": "{{foreignCompanyId}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"viewer\"\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/companies/members/{{companyMemberId}}/role", "host": ["{{base_url}}"], "path": ["api","v1","companies","members","{{companyMemberId}}","role"] },
+            "description": "Debe responder 403 antes de mutar cuando X-Company-Id no pertenece al usuario autenticado."
           }
         },
         {
@@ -257,30 +593,6 @@
             ],
             "body": { "mode": "raw", "raw": "{\n  \"name\": \"Updated Name\"\n}" },
             "url": { "raw": "{{base_url}}/api/v1/users/:id", "host": ["{{base_url}}"], "path": ["api","v1","users",":id"] }
-          }
-        },
-        {
-          "name": "Deactivate Company Membership",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
-            ],
-            "url": { "raw": "{{base_url}}/api/v1/users/:id", "host": ["{{base_url}}"], "path": ["api","v1","users",":id"] }
-          }
-        },
-        {
-          "name": "Change Company Role",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "X-Company-Id", "value": "{{activeCompanyId}}" }
-            ],
-            "body": { "mode": "raw", "raw": "{\n  \"role\": \"admin\"\n}" },
-            "url": { "raw": "{{base_url}}/api/v1/users/:id/role", "host": ["{{base_url}}"], "path": ["api","v1","users",":id","role"] }
           }
         }
       ]
@@ -481,6 +793,9 @@
   "variable": [
     { "key": "base_url", "value": "http://localhost:3000" },
     { "key": "token", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "otherUserToken", "value": "" },
+    { "key": "activeMemberEmail", "value": "" },
     { "key": "userId", "value": "" },
     { "key": "activeCompanyId", "value": "" },
     { "key": "emailVerificationToken", "value": "" },
@@ -490,6 +805,15 @@
     { "key": "companyIdB", "value": "" },
     { "key": "foreignCompanyId", "value": "" },
     { "key": "companyInvitationToken", "value": "" },
+    { "key": "expiredCompanyInvitationToken", "value": "" },
+    { "key": "acceptedCompanyInvitationToken", "value": "" },
+    { "key": "declinedCompanyInvitationToken", "value": "" },
+    { "key": "revokedCompanyInvitationToken", "value": "" },
+    { "key": "companyInvitationId", "value": "" },
+    { "key": "companyMemberId", "value": "" },
+    { "key": "ownerCompanyMemberId", "value": "" },
+    { "key": "selfCompanyMemberId", "value": "" },
+    { "key": "lastOwnerCompanyMemberId", "value": "" },
     { "key": "projectId", "value": "" },
     { "key": "id", "value": "" }
   ]

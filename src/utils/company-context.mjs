@@ -6,6 +6,7 @@ const serializeCompany = (company) => {
         _id: id,
         name: plain.name,
         legalName: plain.legalName,
+        taxId: plain.taxId,
         status: plain.status,
         plan: plain.plan,
         timezone: plain.timezone,

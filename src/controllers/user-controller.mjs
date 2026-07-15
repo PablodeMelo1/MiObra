@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { createError } from '../error/create-error.mjs';
-import { COMPANY_INVITATION_STATUS, COMPANY_ROLES } from '../constants/companyRoles.mjs';
+import { COMPANY_INVITATION_STATUS, COMPANY_MEMBER_STATUS, COMPANY_ROLES } from '../constants/companyRoles.mjs';
 import { createInvitationToken, hashInvitationToken } from '../utils/invitation-token.mjs';
 import { serializeCompanyContext } from '../utils/company-context.mjs';
 import { buildEmailVerificationUrl, sendEmailVerification } from '../services/email-service.mjs';
@@ -17,6 +17,9 @@ const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
 const EMAIL_VERIFICATION_RESEND_COOLDOWN_MS = 60 * 1000;
 const EMAIL_VERIFICATION_RATE_WINDOW_MS = 15 * 60 * 1000;
 const EMAIL_VERIFICATION_RATE_LIMIT = 3;
+const EMAIL_VERIFICATION_RESEND_GENERIC_RESPONSE = {
+    message: 'Si existe una cuenta pendiente, enviaremos un nuevo email de verificacion.',
+};
 const emailVerificationAttempts = new Map();
 
 const getCookieOptions = () => {
@@ -55,6 +58,8 @@ const signTokenAndSetCookie = (res, user, activeCompanyId = null) => {
 
 const normalizeEmail = (email) => String(email || '').trim().toLowerCase();
 
+const isProduction = () => process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL);
+
 const isEmailVerified = (user) => !user?.emailVerificationStatus || user.emailVerificationStatus === 'verified';
 
 const createEmailVerificationFields = () => {
@@ -66,24 +71,27 @@ const createEmailVerificationFields = () => {
             emailVerifiedAt: null,
             emailVerificationTokenHash: hashInvitationToken(token),
             emailVerificationTokenExpiresAt: new Date(Date.now() + EMAIL_VERIFICATION_TTL_MS),
-            emailVerificationLastSentAt: new Date(),
+            emailVerificationLastSentAt: null,
         },
     };
 };
 
-const serializeEmailVerificationResponse = ({ user, token = null, delivery = null }) => {
+const serializeEmailVerificationResponse = ({ user, token = null, delivery = null, deliveryFailed = false }) => {
     const payload = {
-        message: 'Cuenta creada. Revisa tu email para verificarla antes de iniciar sesion.',
+        message: deliveryFailed
+            ? 'Cuenta creada, pero no pudimos enviar la verificacion. Solicita un nuevo envio.'
+            : 'Cuenta creada. Revisa tu email para verificarla antes de iniciar sesion.',
         email: user.email,
         emailVerificationStatus: user.emailVerificationStatus,
         emailVerificationExpiresAt: user.emailVerificationTokenExpiresAt,
+        emailDeliveryStatus: deliveryFailed ? 'failed' : 'sent',
     };
 
     if (delivery?.provider) {
         payload.emailDeliveryProvider = delivery.provider;
     }
 
-    if (token && process.env.NODE_ENV !== 'production') {
+    if (token && !isProduction()) {
         payload.devVerificationUrl = buildEmailVerificationUrl(token);
     }
 
@@ -110,6 +118,11 @@ const assertEmailVerificationRateLimit = (req, email) => {
 const sendVerificationForUser = async ({ user, token }) => (
     sendEmailVerification({ to: user.email, name: user.name, token })
 );
+
+const recordSuccessfulVerificationDelivery = async (userRepo, userId) => userRepo.updateById(userId, {
+    $set: { emailVerificationLastSentAt: new Date() },
+    $inc: { emailVerificationSentCount: 1 },
+});
 
 const buildAuthContext = async (user, requestedCompanyId = null) => {
     const memberRepo = new CompanyMemberRepository();
@@ -138,14 +151,16 @@ const getValidInvitation = async ({ token, email }) => {
     if (!invitation) {
         throw createError('Invitacion no encontrada', 404);
     }
-    if (invitation.status !== COMPANY_INVITATION_STATUS.SENT && invitation.status !== COMPANY_INVITATION_STATUS.PENDING) {
+    if (invitation.status !== COMPANY_INVITATION_STATUS.SENT) {
         throw createError('La invitacion no esta disponible', 409);
     }
     if (invitation.expiresAt && invitation.expiresAt.getTime() < Date.now()) {
         throw createError('La invitacion expiro', 409);
     }
     if (normalizeEmail(invitation.email) !== normalizeEmail(email)) {
-        throw createError('El email de la cuenta no coincide con la invitacion', 403);
+        const mismatchError = createError('Esta invitacion fue enviada a otra cuenta', 403);
+        mismatchError.code = 'INVITATION_EMAIL_MISMATCH';
+        throw mismatchError;
     }
 
     return invitation;
@@ -154,21 +169,45 @@ const getValidInvitation = async ({ token, email }) => {
 const acceptInvitationForUser = async ({ invitation, user, session = null }) => {
     const invitationRepo = new CompanyInvitationRepository();
     const memberRepo = new CompanyMemberRepository();
-    const existingMember = await memberRepo.findActiveMembership({
-        userId: user._id,
-        companyId: invitation.companyId?._id || invitation.companyId,
-    });
-    if (!existingMember) {
-        await memberRepo.createOne({
-            companyId: invitation.companyId?._id || invitation.companyId,
-            userId: user._id,
-            role: invitation.role,
-            invitedByUserId: invitation.createdByUserId,
-            joinedAt: new Date(),
-        }, session);
+    const companyId = invitation.companyId?._id || invitation.companyId;
+
+    const acceptWithSession = async (activeSession) => {
+        const existingMember = await memberRepo.findMembership({ userId: user._id, companyId }, activeSession);
+        if (existingMember?.status === COMPANY_MEMBER_STATUS.DISABLED) {
+            const reactivated = await memberRepo.reactivateByUserAndCompany({
+                userId: user._id,
+                companyId,
+                role: invitation.role,
+                invitedByUserId: invitation.createdByUserId,
+            }, activeSession);
+            if (!reactivated) throw createError('No pudo reactivarse la membresia', 409);
+        } else if (!existingMember) {
+            await memberRepo.createOne({
+                companyId,
+                userId: user._id,
+                role: invitation.role,
+                invitedByUserId: invitation.createdByUserId,
+                joinedAt: new Date(),
+            }, activeSession);
+        }
+
+        const accepted = await invitationRepo.acceptById(invitation._id, user._id, activeSession);
+        if (!accepted) throw createError('La invitacion ya no esta disponible', 409);
+        return companyId;
+    };
+
+    if (session) return acceptWithSession(session);
+
+    const ownSession = await mongoose.startSession();
+    let activeCompanyId;
+    try {
+        await ownSession.withTransaction(async () => {
+            activeCompanyId = await acceptWithSession(ownSession);
+        });
+        return activeCompanyId;
+    } finally {
+        await ownSession.endSession();
     }
-    await invitationRepo.acceptById(invitation._id, user._id, session);
-    return invitation.companyId?._id || invitation.companyId;
 };
 
 export const createUser = async (req, res) => {
@@ -176,8 +215,8 @@ export const createUser = async (req, res) => {
         const userRepo = new UserRepository();
         const companyRepo = new CompanyRepository();
         const memberRepo = new CompanyMemberRepository();
-        const { name, email, password, companyName, invitationToken, employeeInvitationToken } = req.body;
-        if (!name || !email || !password || (!companyName && !invitationToken && !employeeInvitationToken)) {
+        const { name, email, password, companyName, employeeInvitationToken } = req.body;
+        if (!name || !email || !password || (!companyName && !employeeInvitationToken)) {
             return res.status(400).json({ message: "Faltan datos obligatorios" });
         }
 
@@ -186,7 +225,6 @@ export const createUser = async (req, res) => {
         if (existing) {
             return res.status(409).json({ message: 'El email ya esta registrado' });
         }
-        const invitation = await getValidInvitation({ token: invitationToken, email: normalizedEmail });
         let activeCompanyId;
         let createdUser;
         const verification = createEmailVerificationFields();
@@ -199,25 +237,21 @@ export const createUser = async (req, res) => {
                     email: normalizedEmail,
                     passwordHash,
                     ...verification.fields,
-                    emailVerificationSentCount: 1,
+                    emailVerificationSentCount: 0,
                 };
                 createdUser = await userRepo.createOne(newUser, session);
 
-                if (invitation) {
-                    activeCompanyId = await acceptInvitationForUser({ invitation, user: createdUser, session });
-                } else {
-                    const createdCompany = await companyRepo.createOne({
-                        name: companyName,
-                        createdByUserId: createdUser._id,
-                    }, session);
-                    activeCompanyId = createdCompany._id;
-                    await memberRepo.createOne({
-                        companyId: createdCompany._id,
-                        userId: createdUser._id,
-                        role: COMPANY_ROLES.OWNER,
-                        joinedAt: new Date(),
-                    }, session);
-                }
+                const createdCompany = await companyRepo.createOne({
+                    name: companyName,
+                    createdByUserId: createdUser._id,
+                }, session);
+                activeCompanyId = createdCompany._id;
+                await memberRepo.createOne({
+                    companyId: createdCompany._id,
+                    userId: createdUser._id,
+                    role: COMPANY_ROLES.OWNER,
+                    joinedAt: new Date(),
+                }, session);
                 if (employeeInvitationToken) {
                     await acceptEmployeeInvitationForUser({
                         token: employeeInvitationToken,
@@ -230,8 +264,26 @@ export const createUser = async (req, res) => {
             await session.endSession();
         }
 
-        const delivery = await sendVerificationForUser({ user: createdUser, token: verification.token });
-        res.status(201).json(serializeEmailVerificationResponse({ user: createdUser, token: verification.token, delivery }));
+        let delivery = null;
+        let deliveryFailed = false;
+        try {
+            delivery = await sendVerificationForUser({ user: createdUser, token: verification.token });
+            try {
+                createdUser = await recordSuccessfulVerificationDelivery(userRepo, createdUser._id);
+            } catch (metadataError) {
+                console.error('Email verification delivery metadata update failed:', metadataError.message);
+            }
+        } catch (deliveryError) {
+            deliveryFailed = true;
+            console.error('Email verification delivery failed:', deliveryError.message);
+        }
+
+        res.status(201).json(serializeEmailVerificationResponse({
+            user: createdUser,
+            token: verification.token,
+            delivery,
+            deliveryFailed,
+        }));
     } catch (error) {
         console.error('createUser error:', error);
         return res.status(error.statusCode || 500).json({ message: error.message || "No pudo crear el usuario" });
@@ -246,18 +298,18 @@ export const loginUser = async (req, res) => {
         if (!user) {
             return res.status(401).json({ message: "Email o contrasena incorrectos" });
         }
-        if (!isEmailVerified(user)) {
-            return res.status(403).json({
-                message: 'Debes verificar tu email antes de iniciar sesion',
-                code: 'EMAIL_NOT_VERIFIED',
-                email: user.email,
-                emailVerificationStatus: user.emailVerificationStatus,
-            });
-        }
         const passwordHash = user.passwordHash;
         const validatePassword = await bcrypt.compare(password, passwordHash);
 
         if (validatePassword) {
+            if (!isEmailVerified(user)) {
+                return res.status(403).json({
+                    message: 'Debes verificar tu email antes de iniciar sesion',
+                    code: 'EMAIL_NOT_VERIFIED',
+                    email: user.email,
+                    emailVerificationStatus: user.emailVerificationStatus,
+                });
+            }
             const context = await buildAuthContext(user, req.headers['x-company-id']);
             signTokenAndSetCookie(res, user, context.activeCompanyId);
             res.status(200).json(context);
@@ -307,11 +359,8 @@ export const resendEmailVerification = async (req, res) => {
 
         const userRepo = new UserRepository();
         const user = await userRepo.getByEmail(email);
-        if (!user) {
-            return res.status(200).json({ message: 'Si existe una cuenta pendiente, enviaremos un nuevo email de verificacion.' });
-        }
-        if (isEmailVerified(user)) {
-            return res.status(409).json({ message: 'El email ya esta verificado' });
+        if (!user || isEmailVerified(user)) {
+            return res.status(200).json(EMAIL_VERIFICATION_RESEND_GENERIC_RESPONSE);
         }
         if (
             user.emailVerificationLastSentAt
@@ -323,9 +372,23 @@ export const resendEmailVerification = async (req, res) => {
         const verification = createEmailVerificationFields();
         const updatedUser = await userRepo.updateById(user._id, {
             $set: verification.fields,
-            $inc: { emailVerificationSentCount: 1 },
         });
-        const delivery = await sendVerificationForUser({ user: updatedUser, token: verification.token });
+        let delivery;
+        try {
+            delivery = await sendVerificationForUser({ user: updatedUser, token: verification.token });
+        } catch (deliveryError) {
+            console.error('Email verification resend failed:', deliveryError.message);
+            return res.status(503).json({
+                message: 'No pudimos enviar el email de verificacion. Intenta nuevamente.',
+                code: 'EMAIL_DELIVERY_FAILED',
+                email: updatedUser.email,
+            });
+        }
+        try {
+            await recordSuccessfulVerificationDelivery(userRepo, updatedUser._id);
+        } catch (metadataError) {
+            console.error('Email verification resend metadata update failed:', metadataError.message);
+        }
 
         return res.status(200).json({
             message: 'Email de verificacion reenviado.',
@@ -333,7 +396,7 @@ export const resendEmailVerification = async (req, res) => {
             emailVerificationStatus: updatedUser.emailVerificationStatus,
             emailVerificationExpiresAt: updatedUser.emailVerificationTokenExpiresAt,
             emailDeliveryProvider: delivery.provider,
-            ...(process.env.NODE_ENV !== 'production' ? { devVerificationUrl: buildEmailVerificationUrl(verification.token) } : {}),
+            ...(!isProduction() ? { devVerificationUrl: buildEmailVerificationUrl(verification.token) } : {}),
         });
     } catch (error) {
         return res.status(error.statusCode || 500).json({ message: error.message || 'No pudo reenviarse la verificacion' });
@@ -416,7 +479,6 @@ export const updateUser = async (req, res) => {
 
         const updateData = {};
         if (req.body?.name) updateData.name = req.body.name;
-        let verification = null;
         if (req.body?.email) {
             const normalizedEmail = normalizeEmail(req.body.email);
             if (normalizedEmail !== currentUser.email) {
@@ -424,100 +486,77 @@ export const updateUser = async (req, res) => {
                 if (existing && String(existing._id) !== String(id)) {
                     return res.status(409).json({ message: 'El email ya esta registrado' });
                 }
-                verification = createEmailVerificationFields();
                 updateData.email = normalizedEmail;
-                Object.assign(updateData, verification.fields, {
-                    emailVerificationSentCount: Number(currentUser.emailVerificationSentCount || 0) + 1,
-                });
             }
         }
         const updatedUser = await userRepo.updateById(id, updateData);
         if (!updatedUser) {
             return res.status(404).json({ message: "Usuario no encontrado o no se pudo actualizar" });
         }
-        let delivery = null;
-        if (verification) {
-            delivery = await sendVerificationForUser({ user: updatedUser, token: verification.token });
-        }
-        res.status(200).json({
-            user: serializeUser(updatedUser),
-            ...(verification ? {
-                message: 'Perfil actualizado. Verifica el nuevo email antes de continuar.',
-                emailDeliveryProvider: delivery?.provider,
-                ...(process.env.NODE_ENV !== 'production' ? { devVerificationUrl: buildEmailVerificationUrl(verification.token) } : {}),
-            } : {}),
-        });
+        res.status(200).json({ user: serializeUser(updatedUser) });
     } catch (error) {
         return res.status(error.statusCode || 500).json({ message: error.message || "No pudo actualizar el usuario" });
     }
 };
 
-export const deleteUser = async (req, res) => {
-    try {
-        const memberRepo = new CompanyMemberRepository();
-        const { id } = req.params;
-        if (String(req.user.id) === String(id)) {
-            return res.status(400).json({ message: "No puedes quitar tu propia membresia desde este endpoint" });
-        }
-
-        const members = await memberRepo.findActiveByCompanyId(req.companyId);
-        const member = members.find((companyMember) => String(companyMember.userId?._id || companyMember.userId) === String(id));
-        if (!member) {
-            return res.status(404).json({ message: "Miembro no encontrado" });
-        }
-
-        await memberRepo.deleteByIdForCompany(member._id, req.companyId);
-        res.status(200).json({ message: "Membresia desactivada correctamente" });
-    } catch (error) {
-        throw createError("No pudo desactivar la membresia", 500);
-    }
+const getCompanyInvitationForSession = async (req) => {
+    const userRepo = new UserRepository();
+    const user = await userRepo.getById(req.user.id);
+    if (!user) throw createError('Usuario no encontrado', 404);
+    const invitation = await getValidInvitation({ token: req.params.token, email: user.email });
+    return { user, invitation };
 };
 
-export const changeUserRole = async (req, res) => {
+const serializeCompanyInvitationPreview = (invitation) => ({
+    company: {
+        _id: invitation.companyId?._id || invitation.companyId,
+        name: invitation.companyId?.name,
+    },
+    role: invitation.role,
+    expiresAt: invitation.expiresAt,
+    status: invitation.status,
+    email: invitation.email,
+});
+
+export const previewCompanyInvitation = async (req, res) => {
     try {
-        const memberRepo = new CompanyMemberRepository();
-        const { id } = req.params;
-        const { role } = req.body;
-
-        if (!role || !Object.values(COMPANY_ROLES).includes(role)) {
-            return res.status(400).json({
-                message: `Rol invalido. Los roles validos son: ${Object.values(COMPANY_ROLES).join(", ")}`,
-            });
-        }
-
-        if (String(req.user.id) === String(id)) {
-            return res.status(403).json({ message: "No puedes cambiar tu propio rol de empresa" });
-        }
-
-        const members = await memberRepo.findActiveByCompanyId(req.companyId);
-        const member = members.find((companyMember) => String(companyMember.userId?._id || companyMember.userId) === String(id));
-        if (!member) {
-            return res.status(404).json({ message: "Miembro no encontrado" });
-        }
-
-        const updatedMember = await memberRepo.updateByIdForCompany(member._id, req.companyId, { role });
-
-        res.status(200).json({ message: "Rol de empresa actualizado correctamente", member: updatedMember });
+        const { invitation } = await getCompanyInvitationForSession(req);
+        return res.status(200).json({ invitation: serializeCompanyInvitationPreview(invitation) });
     } catch (error) {
-        throw createError("No pudo cambiar el rol del usuario", 500);
+        return res.status(error.statusCode || 500).json({
+            message: error.message || 'No pudo obtener la invitacion',
+            ...(error.code ? { code: error.code } : {}),
+        });
     }
 };
 
 export const acceptCompanyInvitation = async (req, res) => {
     try {
-        const userRepo = new UserRepository();
-        const user = await userRepo.getById(req.user.id);
-        if (!user) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
-        }
-
-        const invitation = await getValidInvitation({ token: req.params.token, email: user.email });
+        const { user, invitation } = await getCompanyInvitationForSession(req);
         const activeCompanyId = await acceptInvitationForUser({ invitation, user });
         signTokenAndSetCookie(res, user, activeCompanyId);
         const context = await buildAuthContext(user, activeCompanyId);
         return res.status(200).json(context);
     } catch (error) {
-        return res.status(error.statusCode || 500).json({ message: error.message || 'No pudo aceptar la invitacion' });
+        return res.status(error.statusCode || 500).json({
+            message: error.message || 'No pudo aceptar la invitacion',
+            ...(error.code ? { code: error.code } : {}),
+        });
+    }
+};
+
+export const declineCompanyInvitation = async (req, res) => {
+    try {
+        const { user, invitation } = await getCompanyInvitationForSession(req);
+        const invitationRepo = new CompanyInvitationRepository();
+        const declined = await invitationRepo.declineById(invitation._id, user._id);
+        if (!declined) throw createError('La invitacion ya no esta disponible', 409);
+        return res.status(200).json({ message: 'Invitacion rechazada correctamente' });
+    } catch (error) {
+        return res.status(error.statusCode || 500).json({
+            message: error.message || 'No pudo rechazarse la invitacion',
+            ...(error.code ? { code: error.code } : {}),
+        });
     }
 };
 

@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     emailVerificationStatus: {
         type: String,
         enum: ['pending', 'verified'],
-        default: 'pending',
+        default: 'verified',
         index: true,
     },
     emailVerifiedAt: { type: Date, default: null },

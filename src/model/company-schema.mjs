@@ -18,6 +18,7 @@ const companySchema = new mongoose.Schema({
     timezone: { type: String, default: 'America/Montevideo' },
     currency: { type: String, default: 'UYU' },
     logoUrl: { type: String, default: '' },
+    membershipRevision: { type: Number, default: 0, select: false },
     createdByUserId: { type: ObjectId, ref: 'User', required: true, immutable: true },
 }, { timestamps: true });
 

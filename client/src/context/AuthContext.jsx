@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
     confirmEmailVerificationRequest,
+    acceptCompanyInvitationRequest,
     acceptEmployeeInvitationRequest,
     loginRequest,
     registerRequest,
@@ -79,11 +80,17 @@ export const AuthProvider = ({children}) => {
         return response;
     };
 
-    const confirmEmailVerification = async (token) => confirmEmailVerificationRequest(token);
+    const confirmEmailVerification = confirmEmailVerificationRequest;
 
-    const resendEmailVerification = async (email) => resendEmailVerificationRequest(email);
+    const resendEmailVerification = resendEmailVerificationRequest;
 
     const acceptEmployeeInvitation = async (token) => acceptEmployeeInvitationRequest(token);
+
+    const acceptCompanyInvitation = async (token) => {
+        const response = await acceptCompanyInvitationRequest(token);
+        applyAuthPayload(response.data);
+        return response;
+    };
 
     const signIn = async (user) => {
         try {
@@ -102,6 +109,12 @@ export const AuthProvider = ({children}) => {
         return response;
     };
 
+    const refreshSession = async () => {
+        const response = await verifySessionRequest();
+        applyAuthPayload(response.data);
+        return response;
+    };
+
     const signOut = async () => {
         try {
             await logoutRequest();
@@ -116,9 +129,11 @@ export const AuthProvider = ({children}) => {
             signIn,
             signOut,
             switchCompany,
+            refreshSession,
             confirmEmailVerification,
             resendEmailVerification,
             acceptEmployeeInvitation,
+            acceptCompanyInvitation,
             user,
             companies,
             activeCompany,
