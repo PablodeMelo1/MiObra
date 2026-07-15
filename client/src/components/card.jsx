@@ -11,7 +11,7 @@ function ProjectCard({ name, description, id }) {
     return (
         <button
             type="button"
-            className="h-36 min-w-0 w-full overflow-hidden rounded-lg border border-white/10 bg-[#1d222d] p-4 text-left transition-all duration-200 hover:bg-[#262626] hover:shadow-lg hover:shadow-black/40"
+            className="h-32 min-w-0 w-full overflow-hidden border-l-2 border-white/15 bg-[#101620] p-4 text-left transition-colors hover:border-cyan-300/60 hover:bg-[#131b27]"
             onClick={() => navigate(`/projects/${id}`)}
         >
             <div className="h-full min-w-0 overflow-hidden">

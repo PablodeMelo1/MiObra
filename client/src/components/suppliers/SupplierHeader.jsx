@@ -1,8 +1,9 @@
 function SupplierHeader({ searchValue, onSearchChange, onOpenCreate }) {
   return (
-    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+    <header className="mb-4 flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 className="text-lg font-semibold">Proveedores</h1>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-200/80">Abastecimiento</p>
+        <h1 className="mt-1 text-xl font-semibold tracking-tight">Proveedores</h1>
         <p className="text-xs text-white/60">Contactos, compras abiertas e historial operativo.</p>
       </div>
 
@@ -11,18 +12,19 @@ function SupplierHeader({ searchValue, onSearchChange, onOpenCreate }) {
           value={searchValue}
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder="Buscar por nombre"
-          className="w-full rounded border border-white/15 bg-[#0d1119] px-2 py-1.5 text-xs text-white outline-none placeholder:text-white/35 focus:border-white/30 sm:w-52"
+          aria-label="Buscar proveedores por nombre"
+          className="min-h-10 w-full border border-white/15 bg-[#0d1119] px-3 py-2 text-sm text-white outline-none placeholder:text-white/35 focus:border-cyan-300/60 sm:w-52"
         />
         <button
           type="button"
           onClick={onOpenCreate}
-          className="inline-flex items-center justify-center gap-2 rounded border border-white/20 bg-[#1b2331] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#253247]"
+          className="inline-flex min-h-10 items-center justify-center gap-2 border border-cyan-300/30 px-3 py-2 text-sm font-medium text-cyan-100 hover:bg-cyan-500/10"
         >
           <i className="fa-solid fa-plus" aria-hidden="true" />
           Nuevo proveedor
         </button>
       </div>
-    </div>
+    </header>
   );
 }
 

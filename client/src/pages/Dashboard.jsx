@@ -65,7 +65,7 @@ function Dashboard() {
   return (
     <PageShell>
       <div className="space-y-3">
-        <header className="rounded-lg border border-white/10 bg-[#111723] p-4">
+        <header className="border-b border-white/10 pb-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-xl font-semibold">Panel operativo</h1>
@@ -76,7 +76,7 @@ function Dashboard() {
             <button
               type="button"
               onClick={() => navigate('/calendar')}
-              className="inline-flex items-center justify-center gap-2 rounded border border-cyan-300/30 bg-cyan-500/10 px-3 py-2 text-sm text-cyan-100 hover:bg-cyan-500/20"
+              className="inline-flex items-center justify-center gap-2 border border-cyan-300/30 px-3 py-2 text-sm text-cyan-100 hover:bg-cyan-500/10"
             >
               <i className="fa-regular fa-calendar-days" aria-hidden="true" />
               Ver calendario
@@ -86,7 +86,7 @@ function Dashboard() {
 
         {errorMessage ? <p className="text-xs text-rose-200">{errorMessage}</p> : null}
 
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-px overflow-hidden border-y border-white/10 bg-white/10 sm:grid-cols-2 xl:grid-cols-4">
           <MetricTile label="Obras activas" value={snapshot.projects.length} detail="Proyectos en seguimiento" tone="cyan" icon="fa-solid fa-building" />
           <MetricTile label="Tareas vencidas" value={metrics.overdueTasks.length} detail="Requieren accion" tone={metrics.overdueTasks.length ? 'rose' : 'emerald'} icon="fa-solid fa-triangle-exclamation" />
           <MetricTile label="Materiales abiertos" value={metrics.openRequests.length} detail="Pedidos sin recibir" tone="amber" icon="fa-solid fa-truck-ramp-box" />
@@ -112,14 +112,14 @@ function Dashboard() {
             getMeta={(request) => request.supplierId?.name || request.projectId?.name || 'Sin proveedor'}
             tone="emerald"
           />
-          <section className="rounded-lg border border-white/10 bg-[#111723] p-3">
+          <section className="border-t border-white/15 pt-3">
             <h2 className="text-sm font-semibold text-white">Inventario crítico</h2>
             <div className="mt-3 space-y-2">
               {metrics.lowStock.length === 0 ? (
                 <EmptyState title="No hay alertas de stock." />
               ) : (
                 metrics.lowStock.slice(0, 6).map((item) => (
-                  <div key={item._id || item.id} className="rounded border border-white/10 bg-[#0d1119] p-2">
+                  <div key={item._id || item.id} className="border-b border-white/10 px-1 py-2.5 last:border-b-0">
                     <div className="flex items-start justify-between gap-2">
                       <p className="min-w-0 truncate text-sm font-medium text-white/85">{item.name}</p>
                       <StatusBadge tone="rose">{item.availableQuantity}/{item.totalQuantity}</StatusBadge>
@@ -132,7 +132,7 @@ function Dashboard() {
           </section>
         </div>
 
-        <section className="rounded-lg border border-white/10 bg-[#111723] p-3">
+        <section className="border-t border-white/15 pt-3">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-sm font-semibold text-white">Obras recientes</h2>
             <StatusBadge tone="cyan">{snapshot.tasks.length} tareas</StatusBadge>
@@ -146,7 +146,7 @@ function Dashboard() {
                   type="button"
                   key={project._id || project.id}
                   onClick={() => navigate(`/projects/${project._id || project.id}`)}
-                  className="rounded border border-white/10 bg-[#0d1119] p-3 text-left hover:border-cyan-300/30"
+                  className="border-l-2 border-white/10 bg-white/[0.018] p-3 text-left hover:border-cyan-300/50 hover:bg-white/[0.035]"
                 >
                   <p className="truncate text-sm font-semibold text-white/90">{project.name}</p>
                   <p className="mt-1 line-clamp-2 text-xs text-white/50">{project.description || project.location || 'Sin descripcion'}</p>

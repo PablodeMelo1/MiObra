@@ -1,5 +1,5 @@
 {
-  "$schema_comment": "Configuracion local del harness de MiObra. El flujo de trabajo es multiagente y secuencial: leader -> implementer -> reviewer.",
+  "$schema_comment": "Configuracion local del harness de MiObra. El flujo de trabajo es multiagente y secuencial: leader -> frontend-designer -> implementer -> reviewer.",
   "harness": {
     "name": "MiObra AI Harness",
     "mode": "multi-agent-sequential",
@@ -13,12 +13,18 @@
       },
       {
         "order": 2,
-        "agent": "implementer",
-        "definition": ".agents/agentes/implementer.md",
-        "responsibility": "Implementa exactamente el scope definido por el leader y ajusta verificaciones cuando corresponda."
+        "agent": "frontend-designer",
+        "definition": ".agents/agentes/frontend-designer.md",
+        "responsibility": "Analiza, disena e implementa la presentacion frontend del scope; si la tarea no involucra frontend, emite NO_APLICA sin editar archivos."
       },
       {
         "order": 3,
+        "agent": "implementer",
+        "definition": ".agents/agentes/implementer.md",
+        "responsibility": "Completa e integra el scope definido por el leader, incluida la logica, backend, contratos y verificaciones, respetando el handoff frontend."
+      },
+      {
+        "order": 4,
         "agent": "reviewer",
         "definition": ".agents/agentes/reviewer.md",
         "responsibility": "Revisa el diff, valida contra los docs y ejecuta la verificacion final disponible."

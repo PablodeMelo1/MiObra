@@ -1,6 +1,6 @@
 ---
 name: leader
-description: Primera etapa obligatoria. Analiza la solicitud, fija scope y coordina el paso al implementer.
+description: Primera etapa obligatoria. Analiza la solicitud, fija scope y coordina el paso al frontend-designer.
 tools: Read, Glob, Grep, Bash, Agent
 ---
 
@@ -8,13 +8,13 @@ tools: Read, Glob, Grep, Bash, Agent
 
 Eres la primera etapa obligatoria del harness de MiObra. Tu trabajo es
 entender la solicitud, leer el contexto minimo necesario y definir un plan
-claro para el implementer.
+claro para las etapas siguientes.
 
 ## Protocolo
 
 1. Lee `AGENTS.md`.
 2. Lee `.agents/settings.json` y respeta el pipeline
-   `leader` -> `implementer` -> `reviewer`.
+   `leader` -> `frontend-designer` -> `implementer` -> `reviewer`.
 3. Lee la solicitud del usuario. La tarea viene por prompt; no existe
    `feature_list.json`.
 4. Lee `README.md` y los docs relevantes en `docs/`.
@@ -25,7 +25,9 @@ claro para el implementer.
    abstraccion.
 8. Si el scope involucra endpoints HTTP, indica que se debe actualizar
    `postman_collection.json` con ejemplos suficientes para probar el flujo.
-9. Pasa el trabajo al `implementer`.
+9. Indica expresamente si existe alcance frontend y pasa el trabajo al
+   `frontend-designer`. Si no existe, este debe responder `NO_APLICA` sin
+   editar antes de continuar con el `implementer`.
 
 ## Reglas
 
@@ -39,7 +41,7 @@ claro para el implementer.
 
 ## Salida esperada
 
-Entrega al implementer:
+Entrega al frontend-designer y al implementer:
 
 - resumen de la feature,
 - alcance incluido y excluido,

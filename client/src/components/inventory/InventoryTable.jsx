@@ -18,17 +18,17 @@ const getStockLabel = (item) => {
 function InventoryTable({ items, getItemTypeLabel, onOpenDetails, onOpenEdit, onDelete }) {
   if (items.length === 0) {
     return (
-      <p className="rounded border border-white/10 bg-[#10141d] p-4 text-sm text-white/60">
+      <p className="border-l-2 border-white/15 bg-white/[0.025] p-4 text-sm text-white/60">
         No hay items de inventario para los filtros seleccionados.
       </p>
     );
   }
 
   return (
-    <div className="mb-4 overflow-x-auto rounded-2xl border border-white/10 bg-[#111723] p-2">
+    <div className="mb-4 overflow-x-auto border border-white/10 bg-[#101620]">
       <table className="min-w-[760px] border-collapse text-sm">
         <thead>
-          <tr className="border-b border-white/10 text-left text-white/60">
+          <tr className="border-b border-white/10 bg-white/[0.025] text-left text-xs uppercase tracking-wide text-white/55">
             <th className="px-2 py-2">Nombre</th>
             <th className="px-2 py-2">Tipo</th>
             <th className="px-2 py-2">Total</th>

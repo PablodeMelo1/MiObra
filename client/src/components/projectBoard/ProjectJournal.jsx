@@ -18,7 +18,7 @@ function ProjectJournal({ comments, loading, error, onCreate }) {
   };
 
   return (
-    <section className="rounded-lg border border-white/10 bg-[#111723] p-3">
+    <section className="border-t border-white/15 pt-3">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold">Bitacora de obra</h2>
@@ -52,7 +52,7 @@ function ProjectJournal({ comments, loading, error, onCreate }) {
           <EmptyState title="Todavia no hay registros de bitacora." detail="Usala para dejar contexto diario de la obra." />
         ) : (
           comments.map((comment) => (
-            <article key={comment._id || comment.id} className="rounded border border-white/10 bg-[#0d1119] p-3">
+            <article key={comment._id || comment.id} className="border-b border-white/10 px-1 py-3 last:border-b-0">
               <div className="flex items-start justify-between gap-2">
                 <p className="text-xs font-medium text-white/75">{getAuthor(comment)}</p>
                 <time className="text-[11px] text-white/40">{formatDateTime(comment.createdAt)}</time>

@@ -1,7 +1,7 @@
 function ItemDetailsHeader({ onEdit, onBack }) {
   return (
     <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-      <h1 className="text-xl font-semibold">Detalle de item</h1>
+      <div><p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-200/80">Inventario</p><h1 className="mt-1 text-xl font-semibold tracking-tight">Detalle de item</h1></div>
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"

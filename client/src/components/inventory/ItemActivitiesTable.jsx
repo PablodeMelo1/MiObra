@@ -11,9 +11,9 @@ function ItemActivitiesTable({
   onReturnPartial,
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-[#111723] p-4">
+    <section className="border-t border-white/15 pt-4">
       <h2 className="mb-3 text-base font-semibold">Historial del item</h2>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto border border-white/10 bg-[#101620]">
         <table className="min-w-[900px] border-collapse text-sm">
           <thead>
             <tr className="border-b border-white/10 text-left text-white/60">
@@ -76,7 +76,7 @@ function ItemActivitiesTable({
         </table>
       </div>
       {rowActionError ? <p className="mt-2 text-xs text-rose-200">{rowActionError}</p> : null}
-    </div>
+    </section>
   );
 }
 

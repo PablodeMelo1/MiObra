@@ -5,7 +5,7 @@ function TaskCard({ task, onDragStart, onEdit, onDelete, assignedLabel }) {
     <article
       draggable
       onDragStart={(event) => onDragStart(event, task)}
-      className="rounded-md border border-white/10 bg-[#151922] p-2 shadow-sm transition hover:border-white/20 hover:bg-[#1a1f2a]"
+      className="border-l-2 border-white/10 bg-[#151b25] p-2 transition-colors hover:border-cyan-300/45 hover:bg-[#18212d]"
     >
       <div className="flex items-start justify-between gap-2">
         <h4 className="text-xs font-semibold text-white">{task.title}</h4>

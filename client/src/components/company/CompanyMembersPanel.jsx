@@ -13,12 +13,12 @@ function CompanyMembersPanel({ members, currentUserId, currentRole, canManage, b
   const canManageMember = (member) => canManage && !(currentRole === 'admin' && member.role === 'owner');
 
   return (
-    <section className="overflow-hidden rounded-xl border border-white/10 bg-[#111723]">
-      <div className="p-4">
+    <section className="overflow-hidden border-t border-white/15 pt-4">
+      <div className="pb-3">
         <h2 className="text-sm font-semibold">Miembros</h2>
         <p className="mt-1 text-xs text-white/50">Cuentas con acceso a la empresa activa.</p>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto border border-white/10 bg-[#101620]">
         <table className="min-w-[700px] w-full text-left text-sm">
           <thead className="bg-white/5 text-xs uppercase tracking-wide text-white/50">
             <tr>

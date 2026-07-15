@@ -20,7 +20,7 @@ function ProjectControlPanel({ project, tasks, materialRequests, items }) {
 
   return (
     <section className="space-y-3">
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-px overflow-hidden border-y border-white/10 bg-white/10 sm:grid-cols-2 xl:grid-cols-4">
         <MetricTile label="Tareas" value={tasks.length} detail={`${completedTasks} completadas`} tone="cyan" icon="fa-solid fa-list-check" />
         <MetricTile label="Vencidas" value={overdueTasks.length} detail="Fuera de fecha" tone={overdueTasks.length ? 'rose' : 'emerald'} icon="fa-solid fa-clock" />
         <MetricTile label="Materiales abiertos" value={openRequests.length} detail="Pedidos sin recibir" tone="amber" icon="fa-solid fa-truck-ramp-box" />
@@ -28,7 +28,7 @@ function ProjectControlPanel({ project, tasks, materialRequests, items }) {
       </div>
 
       <div className="grid gap-3 xl:grid-cols-3">
-        <div className="rounded-lg border border-white/10 bg-[#111723] p-3">
+        <div className="border-t border-white/15 pt-3">
           <h2 className="text-sm font-semibold">Datos de obra</h2>
           <dl className="mt-3 grid gap-2 text-xs text-white/65">
             <div className="flex justify-between gap-3">
@@ -46,14 +46,14 @@ function ProjectControlPanel({ project, tasks, materialRequests, items }) {
           </dl>
         </div>
 
-        <div className="rounded-lg border border-white/10 bg-[#111723] p-3">
+        <div className="border-t border-white/15 pt-3">
           <h2 className="text-sm font-semibold">Materiales de la obra</h2>
           <div className="mt-3 space-y-2">
             {materialRequests.length === 0 ? (
               <EmptyState title="No hay materiales asociados." />
             ) : (
               materialRequests.slice(0, 4).map((request) => (
-                <div key={request._id || request.id} className="rounded border border-white/10 bg-[#0d1119] p-2">
+                <div key={request._id || request.id} className="border-b border-white/10 px-1 py-2.5 last:border-b-0">
                   <div className="flex items-start justify-between gap-2">
                     <p className="truncate text-sm text-white/85">{request.materialName}</p>
                     <StatusBadge tone={request.status === 'RECIBIDO' ? 'emerald' : 'amber'}>{request.status}</StatusBadge>
@@ -67,14 +67,14 @@ function ProjectControlPanel({ project, tasks, materialRequests, items }) {
           </div>
         </div>
 
-        <div className="rounded-lg border border-white/10 bg-[#111723] p-3">
+        <div className="border-t border-white/15 pt-3">
           <h2 className="text-sm font-semibold">Inventario critico</h2>
           <div className="mt-3 space-y-2">
             {lowStockItems.length === 0 ? (
               <EmptyState title="No hay alertas de stock." />
             ) : (
               lowStockItems.slice(0, 4).map((item) => (
-                <div key={item._id || item.id} className="rounded border border-white/10 bg-[#0d1119] p-2">
+                <div key={item._id || item.id} className="border-b border-white/10 px-1 py-2.5 last:border-b-0">
                   <div className="flex items-start justify-between gap-2">
                     <p className="truncate text-sm text-white/85">{item.name}</p>
                     <StatusBadge tone="rose">{item.availableQuantity}/{item.totalQuantity}</StatusBadge>

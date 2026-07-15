@@ -83,8 +83,8 @@ function CompanyInvitationPage() {
   const isWorking = ['loading', 'accepting', 'declining'].includes(status);
 
   return (
-    <main className="grid min-h-screen place-items-center bg-[#0c0f14] px-4 py-8 text-white">
-      <section className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#111723] p-6 shadow-2xl sm:p-8">
+    <main className="grid min-h-screen place-items-center bg-[#090d13] px-4 py-8 text-white">
+      <section className="w-full max-w-lg border-y border-white/15 bg-[#0d131c] px-5 py-6 sm:px-8 sm:py-8">
         <p className="text-sm font-semibold tracking-[0.22em] text-cyan-200">MIOBRA</p>
         <h1 className="mt-2 text-2xl font-semibold">Invitacion a empresa</h1>
 
@@ -92,7 +92,7 @@ function CompanyInvitationPage() {
 
         {invitation && ['ready', 'accepting', 'declining'].includes(status) ? (
           <div className="mt-5 space-y-4">
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="border-l-2 border-cyan-300/45 bg-white/[0.025] px-4 py-3">
               <p className="text-xs uppercase tracking-wide text-white/45">Empresa</p>
               <p className="mt-1 text-lg font-semibold">{invitation.company?.name || 'Empresa'}</p>
               <p className="mt-2 text-sm text-white/60">Rol: {roleLabels[invitation.role] || invitation.role}</p>
@@ -107,7 +107,7 @@ function CompanyInvitationPage() {
         ) : null}
 
         {status === 'mismatch' ? (
-          <div className="mt-5 rounded-xl border border-amber-300/25 bg-amber-500/10 p-4 text-sm text-amber-50">
+          <div className="mt-5 border-l-2 border-amber-300/45 bg-amber-500/10 p-4 text-sm text-amber-50">
             <p className="font-medium">La invitacion no corresponde a {user?.email || 'esta cuenta'}.</p>
             <p className="mt-1 text-amber-50/70">Cierra esta sesion e ingresa con el email que recibio la invitacion.</p>
             <button type="button" onClick={handleChangeAccount} className="mt-4 rounded-lg border border-amber-200/30 px-4 py-2 font-semibold hover:bg-amber-200/10">Cambiar de cuenta</button>

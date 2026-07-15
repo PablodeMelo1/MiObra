@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/sidebar';
+import PageShell from '../components/common/PageShell';
 import LoadingScreen from '../components/routing/LoadingScreen';
 import { useAuth } from '../context/auth-context';
 import MaterialRequestHeader from '../components/materialRequests/MaterialRequestHeader';
@@ -196,11 +196,8 @@ function MaterialRequests() {
   if (isLoading || loadingData) return <LoadingScreen message="Cargando peticiones..." />;
 
   return (
-    <div className="min-h-screen bg-[#0c0f14] text-white">
-      <div className="flex min-h-screen flex-col items-stretch gap-4 px-3 py-3 sm:px-5 lg:flex-row lg:items-start lg:px-6 lg:py-5">
-        <Sidebar />
-
-        <section className="min-w-0 flex-1 p-0 sm:p-3">
+    <PageShell>
+      <div className="min-w-0">
           <MaterialRequestHeader
             onOpenCreate={openCreateModal}
             statusFilter={statusFilter}
@@ -214,7 +211,6 @@ function MaterialRequests() {
             onEdit={openEditModal}
             onDelete={openDeleteModal}
           />
-        </section>
       </div>
 
       <MaterialRequestFormModal
@@ -235,7 +231,7 @@ function MaterialRequests() {
         onClose={closeDeleteModal}
         onConfirm={handleDelete}
       />
-    </div>
+    </PageShell>
   );
 }
 

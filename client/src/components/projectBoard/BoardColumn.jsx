@@ -22,7 +22,7 @@ function BoardColumn({
     <div
       onDragOver={(event) => event.preventDefault()}
       onDrop={(event) => onColumnDrop(event, listName)}
-      className={`min-h-[70vh] w-64 min-w-64 rounded-lg border bg-[#141a24] p-2 ${
+      className={`min-h-[70vh] w-64 min-w-64 border-t-2 bg-[#111721] p-2 ${
         draggingListName === listName ? 'border-sky-300/40' : 'border-white/10'
       }`}
     >
@@ -33,7 +33,7 @@ function BoardColumn({
             type="button"
             draggable
             onDragStart={(event) => onColumnDragStart(event, listName)}
-            className="rounded border border-white/20 px-1.5 py-0.5 text-[10px] text-white/70 hover:text-white"
+            className="border border-white/15 px-1.5 py-0.5 text-[10px] text-white/70 hover:border-white/30 hover:text-white"
             title="Arrastrar columna"
           >
             ::
@@ -41,7 +41,7 @@ function BoardColumn({
           <button
             type="button"
             onClick={() => onRenameColumn(listName)}
-            className="rounded border border-white/20 px-1.5 py-0.5 text-[10px] text-white/70 hover:text-white"
+            className="border border-white/15 px-1.5 py-0.5 text-[10px] text-white/70 hover:border-white/30 hover:text-white"
             title="Renombrar columna"
           >
             Edit
@@ -52,7 +52,7 @@ function BoardColumn({
           <button
             type="button"
             onClick={() => onCreateTask(listName)}
-            className="rounded border border-white/20 px-1.5 py-0.5 text-[10px] text-white/70 hover:text-white"
+            className="border border-white/15 px-1.5 py-0.5 text-[10px] text-white/70 hover:border-white/30 hover:text-white"
           >
             +
           </button>

@@ -51,16 +51,18 @@ function OperationsCalendar({ events, projects }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-col gap-2 rounded-lg border border-white/10 bg-[#111723] p-3 sm:flex-row sm:items-center sm:justify-between">
+      <header className="flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-lg font-semibold">Calendario operativo</h1>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-200/80">Planificacion</p>
+          <h1 className="mt-1 text-xl font-semibold tracking-tight">Calendario operativo</h1>
           <p className="mt-1 text-xs text-white/55">Vencimientos, pedidos, entregas e hitos de obra.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <select
             value={typeFilter}
             onChange={(event) => setTypeFilter(event.target.value)}
-            className="rounded border border-white/15 bg-[#0d1119] px-2 py-1.5 text-xs text-white outline-none"
+            aria-label="Filtrar por tipo de evento"
+            className="min-h-10 border border-white/15 bg-[#0d1119] px-3 py-2 text-sm text-white outline-none focus:border-cyan-300/60"
           >
             {FILTERS.map((filter) => (
               <option key={filter.value} value={filter.value}>
@@ -71,7 +73,8 @@ function OperationsCalendar({ events, projects }) {
           <select
             value={projectFilter}
             onChange={(event) => setProjectFilter(event.target.value)}
-            className="rounded border border-white/15 bg-[#0d1119] px-2 py-1.5 text-xs text-white outline-none"
+            aria-label="Filtrar por obra"
+            className="min-h-10 border border-white/15 bg-[#0d1119] px-3 py-2 text-sm text-white outline-none focus:border-cyan-300/60"
           >
             <option value="ALL">Todas las obras</option>
             {projects.map((project) => (
@@ -81,18 +84,18 @@ function OperationsCalendar({ events, projects }) {
             ))}
           </select>
         </div>
-      </div>
+      </header>
 
       {eventsByDay.length === 0 ? (
         <EmptyState title="No hay eventos para los filtros seleccionados." />
       ) : (
         <div className="grid gap-3 xl:grid-cols-2">
           {eventsByDay.map(([date, dayEvents]) => (
-            <section key={date} className="rounded-lg border border-white/10 bg-[#111723] p-3">
+            <section key={date} className="border-t border-white/15 pt-3">
               <h2 className="text-sm font-semibold text-white">{formatDate(date)}</h2>
               <div className="mt-3 space-y-2">
                 {dayEvents.map((event) => (
-                  <div key={event.id} className="rounded border border-white/10 bg-[#0d1119] p-2">
+                  <div key={event.id} className="border-b border-white/10 px-1 py-2.5 last:border-b-0">
                     <div className="flex items-start justify-between gap-2">
                       <p className="min-w-0 truncate text-sm font-medium text-white/85">{event.title}</p>
                       <StatusBadge tone={TONE_BY_TYPE[event.type]}>{LABEL_BY_TYPE[event.type]}</StatusBadge>

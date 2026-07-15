@@ -1,6 +1,6 @@
 function ProfileForm({ form, saving, message, error, onChange, onSubmit }) {
   return (
-    <form className="space-y-3 rounded-xl border border-white/10 bg-[#10141d] p-4" onSubmit={onSubmit}>
+    <form className="max-w-3xl space-y-4 border-t border-white/15 pt-4" onSubmit={onSubmit}>
       <h2 className="text-sm font-semibold text-white">Datos del usuario</h2>
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">

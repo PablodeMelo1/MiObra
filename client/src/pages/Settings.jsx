@@ -160,10 +160,11 @@ function Settings() {
   return (
     <PageShell>
       <div className="space-y-4">
-        <header className="rounded-xl border border-white/10 bg-[#111723] p-5">
+        <header className="border-b border-white/10 pb-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-lg font-semibold">Gestion de empresa</h1>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-200/80">Sistema</p>
+              <h1 className="mt-1 text-xl font-semibold tracking-tight">Gestion de empresa</h1>
               <p className="mt-1 text-sm text-white/55">Configura la empresa activa, sus miembros e invitaciones.</p>
             </div>
             <span className="inline-flex w-fit rounded border border-cyan-300/25 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-100">Rol: {companyRole || 'sin rol'}</span>

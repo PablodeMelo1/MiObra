@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Sidebar from '../components/sidebar';
+import PageShell from '../components/common/PageShell';
 import LoadingScreen from '../components/routing/LoadingScreen';
 import EditItemModal from '../components/inventory/EditItemModal';
 import ItemActivitiesTable from '../components/inventory/ItemActivitiesTable';
@@ -293,12 +293,9 @@ function InventoryItemDetails() {
   if (isLoading || loadingData) return <LoadingScreen message="Cargando item..." />;
 
   return (
-    <div className="min-h-screen bg-[#0c0f14] text-white">
-      <div className="flex min-h-screen flex-col items-stretch gap-4 px-3 py-3 sm:px-5 lg:flex-row lg:items-start lg:px-6 lg:py-5">
-        <Sidebar />
-
-        <section className="min-w-0 flex-1 p-0 sm:p-3">
-          <div className="mb-4 rounded-2xl border border-white/10 bg-[#111723] p-4">
+    <PageShell>
+      <div className="min-w-0">
+          <div className="mb-4 border-b border-white/10 pb-4">
             <ItemDetailsHeader onEdit={openEditModal} onBack={() => navigate('/inventory')} />
 
             {errorMessage ? <p className="text-xs text-rose-200">{errorMessage}</p> : null}
@@ -358,9 +355,8 @@ function InventoryItemDetails() {
             onClose={closeEditModal}
             onSubmit={submitEdit}
           />
-        </section>
       </div>
-    </div>
+    </PageShell>
   );
 }
 
